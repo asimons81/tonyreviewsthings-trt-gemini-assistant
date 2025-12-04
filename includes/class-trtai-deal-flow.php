@@ -623,7 +623,7 @@ STYLE;
             return $content;
         }
 
-        return $content . "\n" . $card_html;
+        return $card_html . "\n" . $content;
     }
 
     /**
