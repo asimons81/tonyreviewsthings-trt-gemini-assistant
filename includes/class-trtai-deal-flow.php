@@ -87,11 +87,13 @@ class Trtai_Deal_Flow {
 
         check_admin_referer( 'trtai_generate_deal' );
 
-        $raw_url  = isset( $_POST['deal_url'] ) ? esc_url_raw( wp_unslash( $_POST['deal_url'] ) ) : '';
-        $norm_url = $this->normalize_affiliate_url( $raw_url );
+        $raw_url   = isset( $_POST['deal_url'] ) ? esc_url_raw( wp_unslash( $_POST['deal_url'] ) ) : '';
+        $norm_url  = $this->normalize_affiliate_url( $raw_url );
+        $image_url = isset( $_POST['image_url'] ) ? esc_url_raw( wp_unslash( $_POST['image_url'] ) ) : '';
 
         $payload = array(
             'link' => $norm_url,
+            'image_url' => $image_url,
             'pricing' => array(
                 'current_price'  => isset( $_POST['current_price'] ) ? sanitize_text_field( wp_unslash( $_POST['current_price'] ) ) : '',
                 'original_price' => isset( $_POST['original_price'] ) ? sanitize_text_field( wp_unslash( $_POST['original_price'] ) ) : '',
@@ -133,6 +135,7 @@ class Trtai_Deal_Flow {
 
         $content = isset( $data['content_html'] ) ? $data['content_html'] : '';
         $data['pricing'] = $payload['pricing'];
+        $data['image_url'] = ! empty( $data['image_url'] ) ? esc_url_raw( $data['image_url'] ) : $payload['image_url'];
         if ( $norm_url && strpos( $content, $norm_url ) === false ) {
             $content .= $this->build_product_card_html( $data, $norm_url );
         }
@@ -176,6 +179,9 @@ class Trtai_Deal_Flow {
 
         update_post_meta( $post_id, '_trtai_generated_deal_payload', wp_json_encode( $data ) );
         update_post_meta( $post_id, '_trtai_deal_url', esc_url_raw( $norm_url ) );
+        if ( ! empty( $data['image_url'] ) ) {
+            update_post_meta( $post_id, '_trtai_deal_image_url', esc_url_raw( $data['image_url'] ) );
+        }
         if ( isset( $data['social_captions'] ) ) {
             update_post_meta( $post_id, '_trtai_social_captions', wp_json_encode( $data['social_captions'] ) );
         }
@@ -255,6 +261,7 @@ class Trtai_Deal_Flow {
     protected function build_product_card_html( $data, $norm_url ) {
         $title   = ! empty( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'Featured deal', 'trtai' );
         $excerpt = ! empty( $data['excerpt'] ) ? wp_kses_post( $data['excerpt'] ) : '';
+        $image   = ! empty( $data['image_url'] ) ? esc_url( $data['image_url'] ) : '';
 
         $pricing         = isset( $data['pricing'] ) && is_array( $data['pricing'] ) ? $data['pricing'] : array();
         $current_price   = ! empty( $pricing['current_price'] ) ? sanitize_text_field( $pricing['current_price'] ) : '';
@@ -300,8 +307,12 @@ class Trtai_Deal_Flow {
             </div>
 
             <div class="trtai-deal-card__body">
-                <div class="trtai-deal-card__media" aria-hidden="true">
-                    <div class="trtai-deal-card__placeholder"></div>
+                <div class="trtai-deal-card__media" aria-hidden="<?php echo esc_attr( $image ? 'false' : 'true' ); ?>">
+                    <?php if ( $image ) : ?>
+                        <img class="trtai-deal-card__image" src="<?php echo esc_url( $image ); ?>" loading="lazy" alt="<?php echo esc_attr( $title ); ?>">
+                    <?php else : ?>
+                        <div class="trtai-deal-card__placeholder"></div>
+                    <?php endif; ?>
                 </div>
                 <div class="trtai-deal-card__content">
                     <h3 class="trtai-deal-card__title"><?php echo esc_html( $title ); ?></h3>
