@@ -390,14 +390,16 @@ body {
     border: 1px solid transparent;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     background: var(--trt-accent);
-    color: #031418;
+    color: #fff;
     box-shadow: 0 12px 32px rgba(79, 183, 160, 0.35);
     margin: 0 auto;
 }
 
-.trt-cta-button:hover {
+.trt-cta-button:hover,
+.trt-cta-button:focus {
     transform: translateY(-1px);
     box-shadow: 0 14px 36px rgba(0, 0, 0, 0.25);
+    color: #fff;
 }
 
 .trt-deal-footer {
