@@ -50,6 +50,7 @@ class Trtai_Deal_Flow {
         add_action( 'admin_post_trtai_generate_deal', array( $this, 'handle_generation' ) );
         add_action( 'admin_notices', array( $this, 'maybe_render_notice' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_deal_styles' ) );
+        add_filter( 'the_content', array( $this, 'maybe_append_deal_card' ) );
     }
 
     /**
@@ -355,6 +356,51 @@ class Trtai_Deal_Flow {
         }
 
         wp_enqueue_style( 'trtai-deal-card', TRTAI_PLUGIN_URL . 'assets/css/deal-card.css', array(), TRTAI_PLUGIN_VERSION );
+    }
+
+    /**
+     * Append a generated deal card to the content if missing.
+     *
+     * @param string $content Post content.
+     * @return string
+     */
+    public function maybe_append_deal_card( $content ) {
+        if ( ! is_singular( 'post' ) || ! in_the_loop() || ! is_main_query() ) {
+            return $content;
+        }
+
+        $post_id = get_the_ID();
+        if ( ! $post_id ) {
+            return $content;
+        }
+
+        $deal_url = get_post_meta( $post_id, '_trtai_deal_url', true );
+        if ( empty( $deal_url ) ) {
+            return $content;
+        }
+
+        if ( false !== strpos( $content, 'trtai-deal-card' ) || false !== strpos( $content, $deal_url ) ) {
+            return $content;
+        }
+
+        $payload = get_post_meta( $post_id, '_trtai_generated_deal_payload', true );
+        $data    = json_decode( $payload, true );
+
+        if ( ! is_array( $data ) || empty( $data ) ) {
+            return $content;
+        }
+
+        if ( empty( $data['excerpt'] ) ) {
+            $data['excerpt'] = get_the_excerpt( $post_id );
+        }
+
+        $card_html = $this->build_product_card_html( $data, $deal_url );
+
+        if ( ! $card_html ) {
+            return $content;
+        }
+
+        return $content . "\n" . $card_html;
     }
 
     /**
