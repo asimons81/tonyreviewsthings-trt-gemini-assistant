@@ -384,8 +384,8 @@ class Trtai_Deal_Flow {
         $coupon         = ! empty( $pricing['coupon'] ) ? sanitize_text_field( $pricing['coupon'] ) : '';
         $expires        = ! empty( $pricing['expires'] ) ? sanitize_text_field( $pricing['expires'] ) : '';
 
-        $formatted_current = trim( $currency . ' ' . $current_price );
-        $formatted_regular = trim( $currency . ' ' . $original_price );
+        $formatted_current = trim( $currency . $current_price );
+        $formatted_regular = trim( $currency . $original_price );
 
         $host = wp_parse_url( $norm_url, PHP_URL_HOST );
         if ( $host ) {
@@ -423,7 +423,7 @@ class Trtai_Deal_Flow {
         $savings_amount_text = '';
         if ( $current_numeric > 0 && $original_numeric > $current_numeric ) {
             $savings_amount = $original_numeric - $current_numeric;
-            $savings_amount_text = $currency ? trim( $currency . ' ' . number_format_i18n( $savings_amount, 2 ) ) : number_format_i18n( $savings_amount, 2 );
+            $savings_amount_text = $currency ? trim( $currency . number_format_i18n( $savings_amount, 2 ) ) : number_format_i18n( $savings_amount, 2 );
         }
 
         static $style_printed = false;
