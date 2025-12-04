@@ -27,11 +27,18 @@
             .done(function(response){
                 if (response && response.success && response.data) {
                     var html = '';
+
                     if (response.data.title) {
                         html += '<h3 class="trtai-preview-title">' + response.data.title + '</h3>';
                     }
                     if (response.data.excerpt) {
                         html += '<p class="trtai-preview-excerpt">' + response.data.excerpt + '</p>';
+                    }
+                    if (response.data.card_html) {
+                        html += '<div class="trtai-preview-card">' + response.data.card_html + '</div>';
+                    }
+                    if (response.data.deal_url) {
+                        html += '<p class="trtai-preview-cta"><a class="button" href="' + response.data.deal_url + '" target="_blank" rel="noopener noreferrer">View deal</a></p>';
                     }
                     if (response.data.content) {
                         html += '<div class="trtai-preview-content">' + response.data.content + '</div>';
