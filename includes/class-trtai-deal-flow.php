@@ -307,95 +307,208 @@ class Trtai_Deal_Flow {
             $discount_percent = round( ( ( $original_numeric - $current_numeric ) / $original_numeric ) * 100 );
         }
 
-        $discount_label   = $discount_percent ? sprintf( __( '%s%% OFF', 'trtai' ), $discount_percent ) : ( $coupon ? __( 'Stack coupon', 'trtai' ) : __( 'Deal price', 'trtai' ) );
-        $discount_support = $coupon ? sprintf( __( 'Use code %s', 'trtai' ), $coupon ) : ( $expires ? sprintf( __( 'Ends %s', 'trtai' ), $expires ) : __( 'Limited time', 'trtai' ) );
-        $savings_text     = $discount_percent ? sprintf( __( 'Save %s%% today', 'trtai' ), $discount_percent ) : '';
+        $discount_label = $discount_percent ? sprintf( __( '%s%% OFF', 'trtai' ), $discount_percent ) : ( $coupon ? __( 'Stack coupon', 'trtai' ) : __( 'Deal price', 'trtai' ) );
+
+        $savings_amount_text = '';
+        if ( $current_numeric > 0 && $original_numeric > $current_numeric ) {
+            $savings_amount = $original_numeric - $current_numeric;
+            $savings_amount_text = $currency ? trim( $currency . ' ' . number_format_i18n( $savings_amount, 2 ) ) : number_format_i18n( $savings_amount, 2 );
+        }
+
+        static $style_printed = false;
+        $style_block          = '';
+
+        if ( ! $style_printed ) {
+            $style_block    = $this->get_deal_card_style_block();
+            $style_printed  = true;
+        }
 
         ob_start();
         ?>
-        <div class="trt-card">
-            <div class="trt-card__header">
-                <div class="trt-card__eyebrow">
-                    <span class="trt-pill trt-pill--store"><?php echo esc_html( $store_name ); ?></span>
-                    <span class="trt-pill trt-pill--type"><?php echo esc_html( $deal_type ); ?></span>
-                </div>
-                <span class="trt-chip trt-chip--verified"><?php esc_html_e( 'TRT AI verified pick', 'trtai' ); ?></span>
-            </div>
+        <?php echo $style_block; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+        <article class="trt-deal-card" style="background: #111827; border: 1px solid #1f2937; border-radius: 18px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: #f9fafb; display: flex; flex-direction: column; gap: 12px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+            <header class="trt-deal-header" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; width: 100%; color: #9ca3af; gap: 10px;">
+                <span class="trt-store-badge" style="background: rgba(255,255,255,0.06); border: 1px solid #1f2937; padding: 6px 10px; border-radius: 10px; font-weight: bold; color: #f9fafb;">
+                    <?php echo esc_html( $store_name ); ?>
+                </span>
+                <span class="trt-deal-type" style="color: #4fb7a0; font-weight: bold; margin-left: auto!important; display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; text-align: right; white-space: nowrap;">
+                    <?php echo esc_html( $deal_type ); ?>
+                </span>
+            </header>
 
-            <div class="trt-card__body">
-                <div class="trt-card__media" aria-hidden="<?php echo esc_attr( $image ? 'false' : 'true' ); ?>">
+            <div class="trt-deal-main" style="display: flex; flex-direction: column; gap: 14px; align-items: stretch;">
+                <div class="trt-deal-image-wrapper" style="position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid #1f2937; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center;">
                     <?php if ( $image ) : ?>
-                        <img class="trt-card__image" src="<?php echo esc_url( $image ); ?>" loading="lazy" alt="<?php echo esc_attr( $title ); ?>">
-                    <?php else : ?>
-                        <div class="trt-card__placeholder"></div>
+                        <img class="trt-deal-image" style="max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; width: auto; height: auto; display: block; margin: auto;" src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy" />
                     <?php endif; ?>
-
-                    <div class="trt-card__discount-badge">
-                        <?php if ( $discount_label ) : ?>
-                            <span class="trt-discount__value"><?php echo esc_html( $discount_label ); ?></span>
-                        <?php endif; ?>
-                        <?php if ( $discount_support ) : ?>
-                            <span class="trt-discount__label"><?php echo esc_html( $discount_support ); ?></span>
-                        <?php endif; ?>
-                    </div>
+                    <?php if ( $discount_label ) : ?>
+                        <span class="trt-discount-badge" style="position: absolute; top: 10px; left: 10px; border-radius: 10px; box-shadow: 0 10px 20px rgba(79,183,160,0.4); background: #4fb7a0; color: #031418; font-weight: 800; padding: 6px 10px;">
+                            <?php echo esc_html( $discount_label ); ?>
+                        </span>
+                    <?php endif; ?>
                 </div>
 
-                <div class="trt-card__content">
-                    <p class="trt-card__deal-type-label"><?php echo esc_html( $store_name . ' • ' . $deal_type ); ?></p>
-                    <h3 class="trt-card__title"><?php echo esc_html( $title ); ?></h3>
+                <div class="trt-deal-content" style="display: flex; flex-direction: column; gap: 10px;">
+                    <h2 class="trt-deal-title" style="font-size: 1.5rem; margin: 0; line-height: 1.2; color: #f9fafb;">
+                        <?php echo esc_html( $title ); ?>
+                    </h2>
                     <?php if ( $summary ) : ?>
-                        <p class="trt-card__tagline"><?php echo wp_kses_post( $summary ); ?></p>
+                        <p class="trt-deal-tagline" style="color: #9ca3af; margin: 0;">
+                            <?php echo wp_kses_post( $summary ); ?>
+                        </p>
                     <?php endif; ?>
 
-                    <?php if ( $formatted_current || $formatted_regular || $coupon || $expires || $savings_text ) : ?>
-                        <div class="trt-card__pricing">
+                    <?php if ( $formatted_current || $formatted_regular || $savings_amount_text ) : ?>
+                        <div class="trt-price-row" style="display: flex; align-items: baseline; gap: 10px;">
                             <?php if ( $formatted_current ) : ?>
-                                <span class="trt-price">
-                                    <span class="trt-price__label"><?php esc_html_e( 'Price', 'trtai' ); ?></span>
-                                    <span class="trt-price__current"><?php echo esc_html( $formatted_current ); ?></span>
-                                    <?php if ( $formatted_regular ) : ?>
-                                        <span class="trt-price__regular"><?php echo esc_html( $formatted_regular ); ?></span>
-                                    <?php endif; ?>
+                                <span class="trt-price-current" style="color: #4fb7a0; font-size: 1.8rem; font-weight: 900;">
+                                    <?php echo esc_html( $formatted_current ); ?>
                                 </span>
                             <?php endif; ?>
-
-                            <?php if ( $savings_text ) : ?>
-                                <span class="trt-pill trt-pill--saving"><?php echo esc_html( $savings_text ); ?></span>
+                            <?php if ( $formatted_regular ) : ?>
+                                <span class="trt-price-original" style="color: #9ca3af; text-decoration: line-through;">
+                                    <?php echo esc_html( $formatted_regular ); ?>
+                                </span>
                             <?php endif; ?>
-
-                            <?php if ( $coupon ) : ?>
-                                <span class="trt-pill trt-pill--coupon"><?php printf( esc_html__( 'Coupon: %s', 'trtai' ), esc_html( $coupon ) ); ?></span>
-                            <?php endif; ?>
-
-                            <?php if ( $expires ) : ?>
-                                <span class="trt-pill trt-pill--warning"><?php printf( esc_html__( 'Ends %s', 'trtai' ), esc_html( $expires ) ); ?></span>
+                            <?php if ( $savings_amount_text ) : ?>
+                                <span class="trt-price-savings" style="color: #d4f5ed; font-weight: bold;">
+                                    <?php printf( esc_html__( 'You save %s', 'trtai' ), esc_html( $savings_amount_text ) ); ?>
+                                </span>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
 
-                    <div class="trt-card__cta-row">
-                        <a class="trt-button" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored"><?php echo esc_html( $cta_text ); ?></a>
-                        <span class="trt-card__cta-note"><?php esc_html_e( 'Opens in a new tab with our affiliate link', 'trtai' ); ?></span>
+                    <?php if ( $coupon || $expires ) : ?>
+                        <div class="trt-meta-row" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <?php if ( $coupon ) : ?>
+                                <span class="trt-meta-chip" style="background: rgba(255,255,255,0.04); color: #9ca3af; border: 1px solid #1f2937; padding: 6px 10px; border-radius: 999px; font-size: 0.9rem;">
+                                    <?php printf( esc_html__( 'Coupon: %s', 'trtai' ), esc_html( $coupon ) ); ?>
+                                </span>
+                            <?php endif; ?>
+                            <?php if ( $expires ) : ?>
+                                <span class="trt-meta-chip" style="background: rgba(255,255,255,0.04); color: #9ca3af; border: 1px solid #1f2937; padding: 6px 10px; border-radius: 999px; font-size: 0.9rem;">
+                                    <?php printf( esc_html__( 'Expires %s', 'trtai' ), esc_html( $expires ) ); ?>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ( $coupon ) : ?>
+                        <div class="trt-promo-card" style="background: #0b1017; border: 1px dashed #d4f5ed; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; gap: 1rem;">
+                            <div class="trt-promo-left" style="display: flex; flex-direction: column; gap: 4px;">
+                                <span class="trt-promo-label" style="font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; font-size: 0.85rem;">
+                                    <?php esc_html_e( 'Promo code', 'trtai' ); ?>
+                                </span>
+                                <span class="trt-promo-code" style="font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background: #020617; border: 1px solid #4fb7a0; padding: 6px 10px; border-radius: 10px; letter-spacing: 0.6px; font-weight: 800;">
+                                    <?php echo esc_html( $coupon ); ?>
+                                </span>
+                                <?php if ( $expires ) : ?>
+                                    <span class="trt-promo-expiry" style="color: #9ca3af; font-size: 0.9rem;">
+                                        <?php printf( esc_html__( 'Expires %s', 'trtai' ), esc_html( $expires ) ); ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="trt-cta-row" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-items: center; text-align: center;">
+                        <a class="trt-cta-button" style="display: flex!important; align-items: center!important; justify-content: center!important; text-align: center!important; line-height: 1!important; min-width: 220px; max-width: 100%; border-radius: 10px; padding: 12px 16px; font-weight: 800; text-decoration: none!important; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease,box-shadow 0.15s ease; background: #4fb7a0; color: #031418; box-shadow: 0 12px 32px rgba(79,183,160,0.35); margin: 0 auto;" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored noopener noreferrer">
+                            <?php echo esc_html( $cta_text ); ?>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <div class="trt-card__footer">
-                <div class="trt-card__meta">
-                    <span class="trt-card__meta-item">🏬 <?php echo esc_html( $store_name ); ?></span>
-                    <?php if ( $expires ) : ?>
-                        <span class="trt-card__meta-item">⏰ <?php printf( esc_html__( 'Ends %s', 'trtai' ), esc_html( $expires ) ); ?></span>
-                    <?php endif; ?>
-                    <?php if ( $coupon ) : ?>
-                        <span class="trt-card__meta-item">🔖 <?php printf( esc_html__( 'Use coupon %s', 'trtai' ), esc_html( $coupon ) ); ?></span>
-                    <?php endif; ?>
-                </div>
-                <span class="trt-card__disclaimer"><?php esc_html_e( 'Prices and availability can change quickly—double-check at checkout.', 'trtai' ); ?></span>
-            </div>
-        </div>
+            <footer class="trt-deal-footer" style="border-top: 1px solid #1f2937; padding-top: 10px; color: #9ca3af; font-size: 0.95rem;">
+                <span>
+                    <?php esc_html_e( 'Prices and availability can change quickly—double-check at checkout.', 'trtai' ); ?>
+                </span>
+            </footer>
+        </article>
         <?php
 
         return trim( ob_get_clean() );
+    }
+
+    /**
+     * Return the inline style block for deal cards.
+     *
+     * @return string
+     */
+    protected function get_deal_card_style_block() {
+        $style = <<<'STYLE'
+<style>
+  :root {
+    --trt-bg: #05070a;
+    --trt-bg-elevated: #0b1017;
+    --trt-card-bg: #111827;
+    --trt-card-border: #1f2937;
+    --trt-accent: #4fb7a0;
+    --trt-accent-soft: #d4f5ed;
+    --trt-text-main: #f9fafb;
+    --trt-text-muted: #9ca3af;
+    --trt-badge-bg: #111827;
+    --trt-danger: #f97373;
+    --trt-warning: #fbbf24;
+  }
+  body { font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .trt-app-shell { background: radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%); color: var(--trt-text-main); }
+  .trt-header { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border: 1px solid var(--trt-card-border); border-radius: 14px; background: var(--trt-card-bg); box-shadow: 0 20px 40px rgba(0,0,0,0.25); margin-bottom: 18px; }
+  .trt-logo { font-weight: 800; letter-spacing: 0.2px; font-size: 1.1rem; }
+  .trt-header-actions { display: flex; align-items: center; gap: 10px; }
+  .trt-pill { background: rgba(255,255,255,0.06); color: var(--trt-text-muted); border: 1px solid var(--trt-card-border); border-radius: 999px; padding: 6px 12px; font-size: 0.85rem; }
+  .trt-new-btn { background: var(--trt-accent); color: #031418; border: none; border-radius: 12px; padding: 10px 14px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 30px rgba(79,183,160,0.3); }
+  .trt-new-btn:hover { transform: translateY(-1px); box-shadow: 0 16px 36px rgba(79,183,160,0.35); }
+  .trt-panel { background: var(--trt-card-bg); border: 1px solid var(--trt-card-border); border-radius: 16px; padding: 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.25); }
+  .trt-panel h3 { margin-top: 6px; }
+  .trt-section { border: 1px solid var(--trt-card-border); border-radius: 14px; padding: 12px; margin-bottom: 12px; background: rgba(255,255,255,0.02); }
+  .trt-section h4 { margin-bottom: 6px; color: var(--trt-text-muted); text-transform: uppercase; letter-spacing: 0.2px; font-size: 0.9rem; }
+  .trt-mini-card { border: 1px solid var(--trt-card-border); border-radius: 12px; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.02); }
+  .trt-mini-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .trt-mini-title { font-weight: 700; }
+  .trt-badge { background: var(--trt-badge-bg); border: 1px solid var(--trt-card-border); border-radius: 999px; padding: 4px 8px; font-size: 0.8rem; color: var(--trt-text-muted); }
+  .trt-discount-badge { background: var(--trt-accent); color: #031418; font-weight: 800; padding: 4px 8px; border-radius: 10px; font-size: 0.9rem; }
+  .trt-status { font-size: 0.8rem; color: var(--trt-text-muted); }
+  .trt-mini-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .trt-ghost-btn { border: 1px solid var(--trt-card-border); background: rgba(255,255,255,0.04); color: var(--trt-text-main); border-radius: 8px; padding: 6px 10px; font-size: 0.9rem; cursor: pointer; }
+  .trt-ghost-btn:hover { border-color: var(--trt-accent); color: var(--trt-accent); }
+  .trt-deal-card { background: var(--trt-card-bg); border: 1px solid var(--trt-card-border); border-radius: 18px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: var(--trt-text-main); display: flex; flex-direction: column; gap: 12px; }
+  .trt-deal-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; color: var(--trt-text-muted); gap: 10px; width: 100%; }
+  .trt-store-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--trt-card-border); padding: 6px 10px; border-radius: 10px; font-weight: 700; color: var(--trt-text-main); }
+  .trt-deal-type { color: var(--trt-accent); font-weight: 700; margin-left: auto !important; display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; text-align: right; white-space: nowrap; }
+  .trt-deal-main { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
+  .trt-deal-image-wrapper { position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid var(--trt-card-border); aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; }
+  .trt-deal-image { max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; width: auto; height: auto; display: block; margin: auto; }
+  .trt-deal-image-wrapper .trt-discount-badge { position: absolute; top: 10px; left: 10px; border-radius: 10px; box-shadow: 0 10px 20px rgba(79,183,160,0.4); }
+  .trt-deal-content { display: flex; flex-direction: column; gap: 10px; }
+  .trt-deal-title { font-size: 1.5rem; margin: 0; line-height: 1.2; }
+  .trt-deal-tagline { color: var(--trt-text-muted); margin: 0; }
+  .trt-price-row { display: flex; align-items: baseline; gap: 10px; }
+  .trt-price-current { color: var(--trt-accent); font-size: 1.8rem; font-weight: 900; }
+  .trt-price-original { color: var(--trt-text-muted); text-decoration: line-through; }
+  .trt-price-savings { color: var(--trt-accent-soft); font-weight: 700; }
+  .trt-meta-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .trt-meta-chip { background: rgba(255,255,255,0.04); color: var(--trt-text-muted); border: 1px solid var(--trt-card-border); padding: 6px 10px; border-radius: 999px; font-size: 0.9rem; }
+  .trt-promo-card { background: var(--trt-bg-elevated); border: 1px dashed var(--trt-accent-soft); border-radius: 12px; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; gap: 1rem; }
+  .trt-promo-left { display: flex; flex-direction: column; gap: 4px; }
+  .trt-promo-label { font-weight: 700; color: var(--trt-text-muted); text-transform: uppercase; letter-spacing: 0.4px; font-size: 0.85rem; }
+  .trt-promo-code { font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; background: #020617; border: 1px solid var(--trt-accent); padding: 6px 10px; border-radius: 10px; letter-spacing: 0.6px; font-weight: 800; }
+  .trt-promo-expiry { color: var(--trt-text-muted); font-size: 0.9rem; }
+  .trt-promo-right { display: flex; align-items: center; gap: 10px; }
+  .trt-promo-copy-button { background: var(--trt-accent); color: #031418; border: none; padding: 8px 12px; font-weight: 800; border-radius: 8px; cursor: pointer; }
+  .trt-promo-copy-button:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(79,183,160,0.3); }
+  .trt-promo-copied-toast { color: var(--trt-accent-soft); font-size: 0.85rem; }
+  .trt-cta-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-items: center; text-align: center; }
+  .trt-cta-button { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; line-height: 1 !important; min-width: 220px; max-width: 100%; border-radius: 10px; padding: 12px 16px; font-weight: 800; text-decoration: none !important; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.15s ease; background: var(--trt-accent); color: #031418; box-shadow: 0 12px 32px rgba(79,183,160,0.35); margin: 0 auto; }
+  .trt-cta-button:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(0,0,0,0.25); }
+  .trt-deal-footer { border-top: 1px solid var(--trt-card-border); padding-top: 10px; color: var(--trt-text-muted); font-size: 0.95rem; }
+  @media (max-width: 1024px) {
+    .trt-deal-main { flex-direction: column; }
+  }
+</style>
+STYLE;
+
+        return $style;
     }
 
     /**
@@ -467,7 +580,7 @@ class Trtai_Deal_Flow {
             return $content;
         }
 
-        if ( false !== strpos( $content, 'trtai-deal-card' ) || false !== strpos( $content, $deal_url ) ) {
+        if ( false !== strpos( $content, 'trtai-deal-card' ) || false !== strpos( $content, 'trt-deal-card' ) || false !== strpos( $content, $deal_url ) ) {
             return $content;
         }
 
