@@ -26,6 +26,7 @@ define( 'TRTAI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
  * Load the plugin bootstrap class.
  */
 function trtai_load_plugin() {
+    load_plugin_textdomain( 'trtai', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
     require_once TRTAI_PLUGIN_DIR . 'includes/class-trtai-plugin.php';
 }
 add_action( 'plugins_loaded', 'trtai_load_plugin', 0 );
