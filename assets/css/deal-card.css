@@ -1,4 +1,4 @@
-.trtai-deal-card {
+.trt-card {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -15,7 +15,7 @@
     overflow: hidden;
 }
 
-.trtai-deal-card:before {
+.trt-card:before {
     content: "";
     position: absolute;
     inset: 0;
@@ -23,7 +23,7 @@
     pointer-events: none;
 }
 
-.trtai-deal-card__header {
+.trt-card__header {
     position: relative;
     display: flex;
     align-items: center;
@@ -31,13 +31,13 @@
     gap: 12px;
 }
 
-.trtai-deal-card__badge-row {
+.trt-card__eyebrow {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
 }
 
-.trtai-deal-card__chip {
+.trt-chip {
     padding: 6px 10px;
     border-radius: 999px;
     font-size: 0.85rem;
@@ -46,7 +46,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.trtai-badge {
+.trt-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -60,24 +60,26 @@
     color: #c0d8ff;
 }
 
-.trtai-badge--primary {
+.trt-pill--store,
+.trt-pill--type {
     border-color: rgba(82, 152, 255, 0.35);
     box-shadow: 0 10px 30px rgba(80, 133, 255, 0.25);
 }
 
-.trtai-badge--saving {
+.trt-pill--saving,
+.trt-pill--coupon {
     background: linear-gradient(135deg, rgba(52, 211, 153, 0.2), rgba(16, 185, 129, 0.22));
     color: #ccf6e2;
     border-color: rgba(16, 185, 129, 0.4);
 }
 
-.trtai-badge--warning {
+.trt-pill--warning {
     background: linear-gradient(135deg, rgba(251, 191, 36, 0.18), rgba(249, 115, 22, 0.18));
     color: #ffe9c4;
     border-color: rgba(249, 115, 22, 0.4);
 }
 
-.trtai-deal-card__body {
+.trt-card__body {
     position: relative;
     display: grid;
     grid-template-columns: 190px 1fr;
@@ -85,7 +87,7 @@
     align-items: stretch;
 }
 
-.trtai-deal-card__media {
+.trt-card__media {
     width: 100%;
     min-height: 170px;
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.06), transparent 40%),
@@ -100,7 +102,7 @@
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.trtai-deal-card__image {
+.trt-card__image {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -108,7 +110,7 @@
     background: #0c1020;
 }
 
-.trtai-deal-card__placeholder {
+.trt-card__placeholder {
     width: 60%;
     height: 60%;
     border: 2px dashed rgba(255, 255, 255, 0.22);
@@ -116,32 +118,64 @@
     background: rgba(255, 255, 255, 0.04);
 }
 
-.trtai-deal-card__content {
+.trt-card__discount-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(12, 16, 32, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.trt-discount__value {
+    font-weight: 800;
+    color: #7ed5ff;
+    font-size: 1rem;
+}
+
+.trt-discount__label {
+    color: #c0d8ff;
+    font-size: 0.9rem;
+}
+
+.trt-card__content {
     display: flex;
     flex-direction: column;
     gap: 12px;
 }
 
-.trtai-deal-card__title {
+.trt-card__deal-type-label {
+    margin: 0;
+    color: #9fb6f0;
+    font-size: 0.95rem;
+    letter-spacing: 0.03em;
+}
+
+.trt-card__title {
     margin: 0;
     font-size: 1.35rem;
     color: #f7f9ff;
 }
 
-.trtai-deal-card__excerpt {
+.trt-card__tagline {
     margin: 0;
     color: #c7cee3;
     line-height: 1.6;
 }
 
-.trtai-deal-card__pricing-row {
+.trt-card__pricing {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
 }
 
-.trtai-price {
+.trt-price {
     display: inline-flex;
     align-items: baseline;
     gap: 10px;
@@ -152,13 +186,7 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.trtai-price__current {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #7ed5ff;
-}
-
-.trtai-price__label {
+.trt-price__label {
     font-size: 0.85rem;
     color: #9fb6f0;
     letter-spacing: 0.03em;
@@ -166,20 +194,26 @@
     font-weight: 700;
 }
 
-.trtai-price__regular {
+.trt-price__current {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #7ed5ff;
+}
+
+.trt-price__regular {
     color: #8b93b6;
     text-decoration: line-through;
     font-weight: 600;
 }
 
-.trtai-deal-card__cta-row {
+.trt-card__cta-row {
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
 }
 
-.trtai-deal-card__cta {
+.trt-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -195,24 +229,24 @@
     transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
 }
 
-.trtai-deal-card__cta:hover,
-.trtai-deal-card__cta:focus {
+.trt-button:hover,
+.trt-button:focus {
     transform: translateY(-1px) scale(1.01);
     box-shadow: 0 18px 44px rgba(124, 58, 237, 0.45);
     filter: brightness(1.05);
 }
 
-.trtai-deal-card__cta:focus {
+.trt-button:focus {
     outline: 3px solid rgba(124, 58, 237, 0.35);
     outline-offset: 3px;
 }
 
-.trtai-deal-card__cta-note {
+.trt-card__cta-note {
     color: #9fb6f0;
     font-size: 0.95rem;
 }
 
-.trtai-deal-card__footer {
+.trt-card__footer {
     position: relative;
     display: flex;
     justify-content: space-between;
@@ -222,7 +256,7 @@
     border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.trtai-deal-card__meta {
+.trt-card__meta {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -230,11 +264,11 @@
     font-size: 0.95rem;
 }
 
-.trtai-deal-card__meta strong {
+.trt-card__meta strong {
     color: #f7f9ff;
 }
 
-.trtai-deal-card__meta-item {
+.trt-card__meta-item {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -244,32 +278,37 @@
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+.trt-card__disclaimer {
+    color: #8f9ac0;
+    font-size: 0.9rem;
+}
+
 @media (max-width: 900px) {
-    .trtai-deal-card__body {
+    .trt-card__body {
         grid-template-columns: 1fr;
     }
 
-    .trtai-deal-card__media {
+    .trt-card__media {
         min-height: 200px;
     }
 }
 
 @media (max-width: 640px) {
-    .trtai-deal-card {
+    .trt-card {
         padding: 16px;
     }
 
-    .trtai-deal-card__header,
-    .trtai-deal-card__footer {
+    .trt-card__header,
+    .trt-card__footer {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .trtai-deal-card__cta-row {
+    .trt-card__cta-row {
         width: 100%;
     }
 
-    .trtai-deal-card__cta {
+    .trt-button {
         width: 100%;
         justify-content: center;
     }
