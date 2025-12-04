@@ -119,12 +119,57 @@ class Trtai_Gemini_Client {
         }
 
         $text   = $data['candidates'][0]['content']['parts'][0]['text'];
-        $parsed = json_decode( $text, true );
+        $parsed = $this->maybe_parse_json_response( $text );
 
         return array(
             'raw'    => $data,
             'text'   => $text,
             'parsed' => is_array( $parsed ) ? $parsed : null,
         );
+    }
+
+    /**
+     * Attempt to parse JSON from a Gemini response, even when wrapped in code fences.
+     *
+     * @param string $text Raw response text.
+     * @return array|null
+     */
+    protected function maybe_parse_json_response( $text ) {
+        if ( empty( $text ) || ! is_string( $text ) ) {
+            return null;
+        }
+
+        $decoded = json_decode( $text, true );
+        if ( is_array( $decoded ) ) {
+            return $decoded;
+        }
+
+        $trimmed = trim( $text );
+
+        // Handle fenced JSON blocks (e.g., ```json { ... } ```).
+        if ( preg_match( '/^```(?:json)?\s*(.*?)\s*```$/s', $trimmed, $matches ) ) {
+            $decoded = json_decode( $matches[1], true );
+            if ( is_array( $decoded ) ) {
+                return $decoded;
+            }
+        }
+
+        // Look for the first JSON object in the text.
+        if ( preg_match( '/(\{[\s\S]*\})/U', $text, $matches ) ) {
+            $decoded = json_decode( $matches[1], true );
+            if ( is_array( $decoded ) ) {
+                return $decoded;
+            }
+        }
+
+        // Or the first JSON array.
+        if ( preg_match( '/(\[[\s\S]*\])/U', $text, $matches ) ) {
+            $decoded = json_decode( $matches[1], true );
+            if ( is_array( $decoded ) ) {
+                return $decoded;
+            }
+        }
+
+        return null;
     }
 }
