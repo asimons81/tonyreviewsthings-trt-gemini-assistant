@@ -521,8 +521,9 @@ class Trtai_Deal_Flow {
   .trt-promo-copy-button:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(79,183,160,0.3); }
   .trt-promo-copied-toast { color: var(--trt-accent-soft); font-size: 0.85rem; }
   .trt-cta-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-items: center; text-align: center; }
-  .trt-cta-button { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; line-height: 1 !important; min-width: 220px; max-width: 100%; border-radius: 10px; padding: 12px 16px; font-weight: 800; text-decoration: none !important; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.15s ease; background: var(--trt-accent); color: #031418; box-shadow: 0 12px 32px rgba(79,183,160,0.35); margin: 0 auto; }
-  .trt-cta-button:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(0,0,0,0.25); }
+  .trt-cta-button { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; line-height: 1 !important; min-width: 220px; max-width: 100%; border-radius: 10px; padding: 12px 16px; font-weight: 800; text-decoration: none !important; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.15s ease; background: var(--trt-accent); color: #fff; box-shadow: 0 12px 32px rgba(79,183,160,0.35); margin: 0 auto; }
+  .trt-cta-button:hover,
+  .trt-cta-button:focus { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(0,0,0,0.25); color: #fff; }
   .trt-deal-footer { border-top: 1px solid var(--trt-card-border); padding-top: 10px; color: var(--trt-text-muted); font-size: 0.95rem; }
   @media (max-width: 1024px) {
     .trt-deal-main { flex-direction: column; }
