@@ -629,6 +629,32 @@ STYLE;
             return $content;
         }
 
+        $disclaimer_patterns = array(
+            '/<div[^>]*class=["\'][^"\']*affiliate[^"\']*disclaimer[^"\']*["\'][^>]*>.*?<\\/div>/is',
+            '/<p[^>]*class=["\'][^"\']*affiliate[^"\']*disclaimer[^"\']*["\'][^>]*>.*?<\\/p>/is',
+            '/<p[^>]*>[^<]*affiliate[^<]*disclaimer[^<]*<\\/p>/i',
+            '/<div[^>]*>[^<]*affiliate[^<]*disclaimer[^<]*<\\/div>/i',
+            '/affiliate[^<]*(?:disclosure|disclaimer)[^<]*<\\/p>/i',
+        );
+
+        foreach ( $disclaimer_patterns as $pattern ) {
+            if ( preg_match( $pattern, $content, $matches, PREG_OFFSET_CAPTURE ) ) {
+                $disclaimer       = $matches[0][0];
+                $disclaimer_start = $matches[0][1];
+                $disclaimer_end   = $disclaimer_start + strlen( $disclaimer );
+
+                return substr( $content, 0, $disclaimer_end ) . "\n" . $card_html . substr( $content, $disclaimer_end );
+            }
+        }
+
+        if ( false !== stripos( $content, 'affiliate' ) ) {
+            $replaced = preg_replace( '/(affiliate[^<]*(?:disclosure|disclaimer)[^<]*<\\/[^>]+>)/i', '$1' . "\n" . $card_html, $content, 1 );
+
+            if ( null !== $replaced && $replaced !== $content ) {
+                return $replaced;
+            }
+        }
+
         return $card_html . "\n" . $content;
     }
 
