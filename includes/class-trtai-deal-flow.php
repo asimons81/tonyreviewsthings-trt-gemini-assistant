@@ -478,7 +478,8 @@ class Trtai_Deal_Flow {
             }
             $card_html .= '</div></div>';
         }
-        $card_html .= '<div class="trt-cta-row"><a class="trt-cta-button" href="' . esc_url( $norm_url ) . '" target="_blank" rel="nofollow sponsored noopener noreferrer">' . esc_html( $cta_text ) . '</a></div></div></div>';
+        $cta_inline_style = 'display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1; min-width: 220px; max-width: 100%; border-radius: 10px; padding: 12px 16px; font-weight: 800; text-decoration: none; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.15s ease; background: #4fb7a0; color: #fff; box-shadow: 0 12px 32px rgba(79,183,160,0.35); margin: 0 auto;';
+        $card_html        .= '<div class="trt-cta-row"><a class="trt-cta-button" style="' . esc_attr( $cta_inline_style ) . '" href="' . esc_url( $norm_url ) . '" target="_blank" rel="nofollow sponsored noopener noreferrer">' . esc_html( $cta_text ) . '</a></div></div></div>';
         $card_html .= '<footer class="trt-deal-footer" style="border-top: 1px solid #1f2937; padding-top: 10px; color: #9ca3af; font-size:0.95rem;"><span>' . esc_html__( 'Prices and availability can change quickly—double-check at checkout.', 'trtai' ) . '</span></footer>';
         $card_html .= '</article>';
 
