@@ -48,6 +48,7 @@ class Trtai_Deal_Flow {
 
         add_action( 'admin_menu', array( $this, 'register_menu' ) );
         add_action( 'admin_post_trtai_generate_deal', array( $this, 'handle_generation' ) );
+        add_action( 'wp_ajax_trtai_preview_deal', array( $this, 'handle_preview' ) );
         add_action( 'admin_notices', array( $this, 'maybe_render_notice' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_deal_styles' ) );
         add_filter( 'the_content', array( $this, 'maybe_append_deal_card' ) );
@@ -87,83 +88,24 @@ class Trtai_Deal_Flow {
 
         check_admin_referer( 'trtai_generate_deal' );
 
-        $raw_url   = isset( $_POST['deal_url'] ) ? esc_url_raw( wp_unslash( $_POST['deal_url'] ) ) : '';
-        $norm_url  = $this->normalize_affiliate_url( $raw_url );
-        $image_url = isset( $_POST['image_url'] ) ? esc_url_raw( wp_unslash( $_POST['image_url'] ) ) : '';
-        $card_meta = array(
-            'cta_text'   => isset( $_POST['cta_text'] ) ? sanitize_text_field( wp_unslash( $_POST['cta_text'] ) ) : '',
-            'store_name' => isset( $_POST['store_name'] ) ? sanitize_text_field( wp_unslash( $_POST['store_name'] ) ) : '',
-            'deal_type'  => isset( $_POST['deal_type'] ) ? sanitize_text_field( wp_unslash( $_POST['deal_type'] ) ) : '',
-            'summary'    => isset( $_POST['deal_summary'] ) ? wp_kses_post( wp_unslash( $_POST['deal_summary'] ) ) : '',
-        );
-
-        $payload = array(
-            'link' => $norm_url,
-            'image_url' => $image_url,
-            'card_meta' => $card_meta,
-            'pricing' => array(
-                'current_price'  => isset( $_POST['current_price'] ) ? sanitize_text_field( wp_unslash( $_POST['current_price'] ) ) : '',
-                'original_price' => isset( $_POST['original_price'] ) ? sanitize_text_field( wp_unslash( $_POST['original_price'] ) ) : '',
-                'currency'       => isset( $_POST['currency'] ) ? sanitize_text_field( wp_unslash( $_POST['currency'] ) ) : '',
-                'coupon'         => isset( $_POST['coupon'] ) ? sanitize_text_field( wp_unslash( $_POST['coupon'] ) ) : '',
-                'expires'        => isset( $_POST['expires'] ) ? sanitize_text_field( wp_unslash( $_POST['expires'] ) ) : '',
-            ),
-            'style' => array(
-                'post_type' => isset( $_POST['post_type'] ) ? sanitize_text_field( wp_unslash( $_POST['post_type'] ) ) : 'quick',
-            ),
-            'seo' => array(
-                'keyphrase' => isset( $_POST['deal_keyphrase'] ) ? sanitize_text_field( wp_unslash( $_POST['deal_keyphrase'] ) ) : '',
-            ),
-            'post_settings' => array(
-                'category' => isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0,
-                'tags'     => isset( $_POST['tags'] ) ? sanitize_text_field( wp_unslash( $_POST['tags'] ) ) : '',
-            ),
-        );
-
-        if ( empty( $norm_url ) ) {
+        $payload_data = $this->get_deal_payload_from_request();
+        if ( is_wp_error( $payload_data ) ) {
             wp_safe_redirect( add_query_arg( 'trtai_message', 'missing_url', wp_get_referer() ) );
             exit;
         }
 
-        $instruction = 'Return JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, cta_text, social_captions (threads, facebook, generic). Content should be short, newsy, urgent, and explain why the deal matters. Include HTML for content_html, and keep CTA clear. Do not include markdown.';
+        $payload  = $payload_data['payload'];
+        $norm_url = $payload_data['norm_url'];
 
-        $result = $this->gemini_client->generate_content( $instruction, $payload );
-
-        if ( is_wp_error( $result ) ) {
-            wp_safe_redirect( add_query_arg( array( 'trtai_message' => 'error', 'trtai_error' => rawurlencode( $result->get_error_message() ) ), wp_get_referer() ) );
+        $generation = $this->generate_deal_content( $payload, $norm_url );
+        if ( is_wp_error( $generation ) ) {
+            wp_safe_redirect( add_query_arg( array( 'trtai_message' => 'error', 'trtai_error' => rawurlencode( $generation->get_error_message() ) ), wp_get_referer() ) );
             exit;
         }
 
-        $data = is_array( $result['parsed'] ) ? $result['parsed'] : json_decode( $result['text'], true );
-        if ( ! is_array( $data ) ) {
-            wp_safe_redirect( add_query_arg( array( 'trtai_message' => 'error', 'trtai_error' => rawurlencode( __( 'Invalid response from Gemini.', 'trtai' ) ) ), wp_get_referer() ) );
-            exit;
-        }
-
-        $content = isset( $data['content_html'] ) ? $data['content_html'] : '';
-        $data['pricing'] = $payload['pricing'];
-        $data['image_url'] = ! empty( $data['image_url'] ) ? esc_url_raw( $data['image_url'] ) : $payload['image_url'];
-        $data['card_meta'] = $payload['card_meta'];
-        if ( ! empty( $payload['card_meta']['cta_text'] ) ) {
-            $data['cta_text'] = $payload['card_meta']['cta_text'];
-        }
-        if ( ! empty( $payload['card_meta']['store_name'] ) ) {
-            $data['store']      = $payload['card_meta']['store_name'];
-            $data['store_name'] = $payload['card_meta']['store_name'];
-        }
-        if ( ! empty( $payload['card_meta']['deal_type'] ) ) {
-            $data['deal_type'] = $payload['card_meta']['deal_type'];
-        }
-        if ( ! empty( $payload['card_meta']['summary'] ) ) {
-            $data['tagline'] = $payload['card_meta']['summary'];
-        }
-
-        $card_html = $this->build_product_card_html( $data, $norm_url );
-        $content   = wp_kses_post( $content );
-
-        if ( $card_html ) {
-            $content = $card_html . "\n\n" . $content;
-        }
+        $data    = $generation['data'];
+        $content = $generation['content'];
+        $card_html = $generation['card_html'];
 
         $postarr = array(
             'post_title'   => isset( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'New Deal', 'trtai' ),
@@ -224,6 +166,145 @@ class Trtai_Deal_Flow {
         );
         wp_safe_redirect( $redirect );
         exit;
+    }
+
+    /**
+     * Generate a preview of the deal content without saving a post.
+     */
+    public function handle_preview() {
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'trtai' ) ), 403 );
+        }
+
+        check_ajax_referer( 'trtai_generate_deal' );
+
+        $payload_data = $this->get_deal_payload_from_request();
+        if ( is_wp_error( $payload_data ) ) {
+            wp_send_json_error( array( 'message' => $payload_data->get_error_message() ), 400 );
+        }
+
+        $payload   = $payload_data['payload'];
+        $norm_url  = $payload_data['norm_url'];
+        $generation = $this->generate_deal_content( $payload, $norm_url );
+
+        if ( is_wp_error( $generation ) ) {
+            wp_send_json_error( array( 'message' => $generation->get_error_message() ), 500 );
+        }
+
+        $data    = $generation['data'];
+        $content = $generation['content'];
+
+        $response = array(
+            'title'      => isset( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'New Deal', 'trtai' ),
+            'excerpt'    => isset( $data['excerpt'] ) ? wp_kses_post( $data['excerpt'] ) : '',
+            'content'    => wp_kses_post( $content ),
+            'card_html'  => wp_kses_post( $generation['card_html'] ),
+            'deal_url'   => $norm_url,
+        );
+
+        wp_send_json_success( $response );
+    }
+
+    /**
+     * Build the payload array from the request.
+     *
+     * @return array|WP_Error
+     */
+    protected function get_deal_payload_from_request() {
+        $raw_url   = isset( $_POST['deal_url'] ) ? esc_url_raw( wp_unslash( $_POST['deal_url'] ) ) : '';
+        $norm_url  = $this->normalize_affiliate_url( $raw_url );
+        $image_url = isset( $_POST['image_url'] ) ? esc_url_raw( wp_unslash( $_POST['image_url'] ) ) : '';
+        $card_meta = array(
+            'cta_text'   => isset( $_POST['cta_text'] ) ? sanitize_text_field( wp_unslash( $_POST['cta_text'] ) ) : '',
+            'store_name' => isset( $_POST['store_name'] ) ? sanitize_text_field( wp_unslash( $_POST['store_name'] ) ) : '',
+            'deal_type'  => isset( $_POST['deal_type'] ) ? sanitize_text_field( wp_unslash( $_POST['deal_type'] ) ) : '',
+            'summary'    => isset( $_POST['deal_summary'] ) ? wp_kses_post( wp_unslash( $_POST['deal_summary'] ) ) : '',
+        );
+
+        $payload = array(
+            'link' => $norm_url,
+            'image_url' => $image_url,
+            'card_meta' => $card_meta,
+            'pricing' => array(
+                'current_price'  => isset( $_POST['current_price'] ) ? sanitize_text_field( wp_unslash( $_POST['current_price'] ) ) : '',
+                'original_price' => isset( $_POST['original_price'] ) ? sanitize_text_field( wp_unslash( $_POST['original_price'] ) ) : '',
+                'currency'       => isset( $_POST['currency'] ) ? sanitize_text_field( wp_unslash( $_POST['currency'] ) ) : '',
+                'coupon'         => isset( $_POST['coupon'] ) ? sanitize_text_field( wp_unslash( $_POST['coupon'] ) ) : '',
+                'expires'        => isset( $_POST['expires'] ) ? sanitize_text_field( wp_unslash( $_POST['expires'] ) ) : '',
+            ),
+            'style' => array(
+                'post_type' => isset( $_POST['post_type'] ) ? sanitize_text_field( wp_unslash( $_POST['post_type'] ) ) : 'quick',
+            ),
+            'seo' => array(
+                'keyphrase' => isset( $_POST['deal_keyphrase'] ) ? sanitize_text_field( wp_unslash( $_POST['deal_keyphrase'] ) ) : '',
+            ),
+            'post_settings' => array(
+                'category' => isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0,
+                'tags'     => isset( $_POST['tags'] ) ? sanitize_text_field( wp_unslash( $_POST['tags'] ) ) : '',
+            ),
+        );
+
+        if ( empty( $norm_url ) ) {
+            return new WP_Error( 'missing_url', __( 'Deal URL is required.', 'trtai' ) );
+        }
+
+        return array(
+            'payload'  => $payload,
+            'norm_url' => $norm_url,
+        );
+    }
+
+    /**
+     * Generate Gemini content for a deal payload.
+     *
+     * @param array  $payload Deal payload.
+     * @param string $norm_url Normalized URL.
+     * @return array|WP_Error
+     */
+    protected function generate_deal_content( $payload, $norm_url ) {
+        $instruction = 'Return JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, cta_text, social_captions (threads, facebook, generic). Content should be short, newsy, urgent, and explain why the deal matters. Include HTML for content_html, and keep CTA clear. Do not include markdown.';
+
+        $result = $this->gemini_client->generate_content( $instruction, $payload );
+
+        if ( is_wp_error( $result ) ) {
+            return $result;
+        }
+
+        $data = is_array( $result['parsed'] ) ? $result['parsed'] : json_decode( $result['text'], true );
+        if ( ! is_array( $data ) ) {
+            return new WP_Error( 'invalid_response', __( 'Invalid response from Gemini.', 'trtai' ) );
+        }
+
+        $content         = isset( $data['content_html'] ) ? $data['content_html'] : '';
+        $data['pricing'] = $payload['pricing'];
+        $data['image_url'] = ! empty( $data['image_url'] ) ? esc_url_raw( $data['image_url'] ) : $payload['image_url'];
+        $data['card_meta'] = $payload['card_meta'];
+        if ( ! empty( $payload['card_meta']['cta_text'] ) ) {
+            $data['cta_text'] = $payload['card_meta']['cta_text'];
+        }
+        if ( ! empty( $payload['card_meta']['store_name'] ) ) {
+            $data['store']      = $payload['card_meta']['store_name'];
+            $data['store_name'] = $payload['card_meta']['store_name'];
+        }
+        if ( ! empty( $payload['card_meta']['deal_type'] ) ) {
+            $data['deal_type'] = $payload['card_meta']['deal_type'];
+        }
+        if ( ! empty( $payload['card_meta']['summary'] ) ) {
+            $data['tagline'] = $payload['card_meta']['summary'];
+        }
+
+        $card_html = $this->build_product_card_html( $data, $norm_url );
+        $content   = wp_kses_post( $content );
+
+        if ( $card_html ) {
+            $content = $card_html . "\n\n" . $content;
+        }
+
+        return array(
+            'data'      => $data,
+            'card_html' => $card_html,
+            'content'   => $content,
+        );
     }
 
     /**

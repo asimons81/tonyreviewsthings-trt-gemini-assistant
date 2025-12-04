@@ -93,6 +93,17 @@ class Trtai_Plugin {
         }
 
         wp_enqueue_style( 'trtai-admin', TRTAI_PLUGIN_URL . 'assets/css/admin.css', array(), TRTAI_PLUGIN_VERSION );
+        wp_enqueue_style( 'trtai-deal-card-preview', TRTAI_PLUGIN_URL . 'assets/css/deal-card.css', array(), TRTAI_PLUGIN_VERSION );
         wp_enqueue_script( 'trtai-admin', TRTAI_PLUGIN_URL . 'assets/js/admin.js', array( 'jquery' ), TRTAI_PLUGIN_VERSION, true );
+
+        wp_localize_script(
+            'trtai-admin',
+            'trtaiAdmin',
+            array(
+                'ajax_url'        => admin_url( 'admin-ajax.php' ),
+                'preview_loading' => __( 'Generating preview…', 'trtai' ),
+                'preview_error'   => __( 'Unable to generate preview. Please try again.', 'trtai' ),
+            )
+        );
     }
 }

@@ -16,3 +16,43 @@
 .trtai-filters label {
     margin-right: 12px;
 }
+
+.trtai-preview-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.trtai-preview-box {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.trtai-preview-box.is-loading {
+    opacity: 0.7;
+}
+
+.trtai-preview-title {
+    margin-top: 0;
+    margin-bottom: 6px;
+}
+
+.trtai-preview-excerpt {
+    color: #50575e;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.trtai-preview-content .trt-deal-card,
+.trtai-preview-content .trtai-deal-card {
+    max-width: 880px;
+}
+
+.trtai-preview-box .trtai-error {
+    color: #b32d2e;
+    font-weight: 600;
+}

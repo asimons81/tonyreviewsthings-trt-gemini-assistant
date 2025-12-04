@@ -69,6 +69,16 @@
             <tr><th><label for="tags"><?php esc_html_e( 'Tags', 'trtai' ); ?></label></th><td><input type="text" name="tags" id="tags" class="regular-text" placeholder="<?php esc_attr_e( 'Comma-separated', 'trtai' ); ?>"></td></tr>
         </table>
 
+        <h2><?php esc_html_e( 'Preview', 'trtai' ); ?></h2>
+        <p><?php esc_html_e( 'Generate a preview to approve the output before saving the draft.', 'trtai' ); ?></p>
+        <div class="trtai-preview-actions">
+            <button type="button" class="button button-secondary trtai-deal-preview-btn"><?php esc_html_e( 'Preview post output', 'trtai' ); ?></button>
+            <span class="description"><?php esc_html_e( 'Preview uses your inputs and the AI output without saving a draft.', 'trtai' ); ?></span>
+        </div>
+        <div id="trtai-deal-preview" class="trtai-preview-box" aria-live="polite">
+            <p class="description"><?php esc_html_e( 'Your preview will appear here.', 'trtai' ); ?></p>
+        </div>
+
         <?php submit_button( __( 'Generate Deal Draft', 'trtai' ) ); ?>
     </form>
 </div>
