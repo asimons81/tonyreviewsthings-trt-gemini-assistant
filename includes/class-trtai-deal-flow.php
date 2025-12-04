@@ -157,10 +157,6 @@ class Trtai_Deal_Flow {
         if ( ! empty( $payload['card_meta']['summary'] ) ) {
             $data['tagline'] = $payload['card_meta']['summary'];
         }
-        if ( $norm_url && strpos( $content, $norm_url ) === false ) {
-            $content .= $this->build_product_card_html( $data, $norm_url );
-        }
-
         $postarr = array(
             'post_title'   => isset( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'New Deal', 'trtai' ),
             'post_content' => wp_kses_post( $content ),
