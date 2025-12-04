@@ -41,6 +41,7 @@ class Trtai_Deal_Flow {
         add_action( 'admin_menu', array( $this, 'register_menu' ) );
         add_action( 'admin_post_trtai_generate_deal', array( $this, 'handle_generation' ) );
         add_action( 'admin_notices', array( $this, 'maybe_render_notice' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_deal_styles' ) );
     }
 
     /**
@@ -122,9 +123,9 @@ class Trtai_Deal_Flow {
         }
 
         $content = isset( $data['content_html'] ) ? $data['content_html'] : '';
+        $data['pricing'] = $payload['pricing'];
         if ( $norm_url && strpos( $content, $norm_url ) === false ) {
-            $cta_text = ! empty( $data['cta_text'] ) ? sanitize_text_field( $data['cta_text'] ) : __( 'Get this deal', 'trtai' );
-            $content .= sprintf( '<p><a class="trtai-deal-link" href="%s" target="_blank" rel="nofollow sponsored">%s</a></p>', esc_url( $norm_url ), esc_html( $cta_text ) );
+            $content .= $this->build_product_card_html( $data, $norm_url );
         }
 
         $postarr = array(
@@ -236,6 +237,71 @@ class Trtai_Deal_Flow {
     }
 
     /**
+     * Build the product card HTML snippet.
+     *
+     * @param array  $data     Gemini response data.
+     * @param string $norm_url Normalized affiliate URL.
+     * @return string
+     */
+    protected function build_product_card_html( $data, $norm_url ) {
+        $title   = ! empty( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'Featured deal', 'trtai' );
+        $excerpt = ! empty( $data['excerpt'] ) ? wp_kses_post( $data['excerpt'] ) : '';
+
+        $pricing         = isset( $data['pricing'] ) && is_array( $data['pricing'] ) ? $data['pricing'] : array();
+        $current_price   = ! empty( $pricing['current_price'] ) ? sanitize_text_field( $pricing['current_price'] ) : '';
+        $original_price  = ! empty( $pricing['original_price'] ) ? sanitize_text_field( $pricing['original_price'] ) : '';
+        $currency        = ! empty( $pricing['currency'] ) ? sanitize_text_field( $pricing['currency'] ) : '';
+        $coupon          = ! empty( $pricing['coupon'] ) ? sanitize_text_field( $pricing['coupon'] ) : '';
+        $expires         = ! empty( $pricing['expires'] ) ? sanitize_text_field( $pricing['expires'] ) : '';
+        $cta_text        = ! empty( $data['cta_text'] ) ? sanitize_text_field( $data['cta_text'] ) : __( 'Get this deal', 'trtai' );
+
+        $formatted_current = trim( $currency . ' ' . $current_price );
+        $formatted_regular = trim( $currency . ' ' . $original_price );
+
+        ob_start();
+        ?>
+        <div class="trtai-deal-card">
+            <div class="trtai-deal-card__media" aria-hidden="true">
+                <div class="trtai-deal-card__placeholder"></div>
+            </div>
+            <div class="trtai-deal-card__body">
+                <h3 class="trtai-deal-card__title"><?php echo esc_html( $title ); ?></h3>
+                <?php if ( $excerpt ) : ?>
+                    <p class="trtai-deal-card__excerpt"><?php echo wp_kses_post( $excerpt ); ?></p>
+                <?php endif; ?>
+
+                <?php if ( $formatted_current || $formatted_regular || $coupon || $expires ) : ?>
+                    <div class="trtai-deal-card__pricing">
+                        <?php if ( $formatted_current ) : ?>
+                            <span class="trtai-deal-card__price">
+                                <span class="trtai-deal-card__price-label"><?php esc_html_e( 'Now', 'trtai' ); ?>:</span>
+                                <span><?php echo esc_html( $formatted_current ); ?></span>
+                            </span>
+                        <?php endif; ?>
+
+                        <?php if ( $formatted_regular ) : ?>
+                            <span class="trtai-deal-card__price-original"><?php echo esc_html( $formatted_regular ); ?></span>
+                        <?php endif; ?>
+
+                        <?php if ( $coupon ) : ?>
+                            <span class="trtai-deal-card__badge"><?php printf( esc_html__( 'Coupon: %s', 'trtai' ), esc_html( $coupon ) ); ?></span>
+                        <?php endif; ?>
+
+                        <?php if ( $expires ) : ?>
+                            <span class="trtai-deal-card__badge trtai-deal-card__badge--warning"><?php printf( esc_html__( 'Ends %s', 'trtai' ), esc_html( $expires ) ); ?></span>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
+                <a class="trtai-deal-card__cta" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored"><?php echo esc_html( $cta_text ); ?></a>
+            </div>
+        </div>
+        <?php
+
+        return trim( ob_get_clean() );
+    }
+
+    /**
      * Render notices.
      */
     public function maybe_render_notice() {
@@ -260,6 +326,27 @@ class Trtai_Deal_Flow {
         if ( $text ) {
             printf( '<div class="notice %1$s"><p>%2$s</p></div>', esc_attr( $class ), esc_html( $text ) );
         }
+    }
+
+    /**
+     * Enqueue front-end styles for deal cards on generated posts.
+     */
+    public function enqueue_deal_styles() {
+        if ( ! is_singular( 'post' ) ) {
+            return;
+        }
+
+        $post_id = get_queried_object_id();
+        if ( ! $post_id ) {
+            return;
+        }
+
+        $deal_url = get_post_meta( $post_id, '_trtai_deal_url', true );
+        if ( empty( $deal_url ) ) {
+            return;
+        }
+
+        wp_enqueue_style( 'trtai-deal-card', TRTAI_PLUGIN_URL . 'assets/css/deal-card.css', array(), TRTAI_PLUGIN_VERSION );
     }
 
     /**
