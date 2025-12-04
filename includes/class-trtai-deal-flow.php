@@ -496,15 +496,15 @@ class Trtai_Deal_Flow {
   .trt-mini-card { border: 1px solid var(--trt-card-border); border-radius: 12px; padding: 10px; margin-bottom: 10px; background: rgba(255,255,255,0.02); }
   .trt-mini-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
   .trt-mini-title { font-weight: 700; }
-  .trt-badge { background: var(--trt-badge-bg); border: 1px solid var(--trt-card-border); border-radius: 999px; padding: 4px 8px; font-size: 0.8rem; color: var(--trt-text-muted); }
-  .trt-discount-badge { background: var(--trt-accent); color: #031418; font-weight: 800; padding: 4px 8px; border-radius: 10px; font-size: 0.9rem; }
+  .trt-badge { background: var(--trt-badge-bg); border: 1px solid var(--trt-card-border); border-radius: 999px; padding: 4px 8px; font-size: 0.8rem; color: var(--trt-text-muted); display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+  .trt-discount-badge { background: var(--trt-accent); color: #031418; font-weight: 800; padding: 4px 8px; border-radius: 10px; font-size: 0.9rem; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
   .trt-status { font-size: 0.8rem; color: var(--trt-text-muted); }
   .trt-mini-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .trt-ghost-btn { border: 1px solid var(--trt-card-border); background: rgba(255,255,255,0.04); color: var(--trt-text-main); border-radius: 8px; padding: 6px 10px; font-size: 0.9rem; cursor: pointer; }
   .trt-ghost-btn:hover { border-color: var(--trt-accent); color: var(--trt-accent); }
   .trt-deal-card { background: var(--trt-card-bg); border: 1px solid var(--trt-card-border); border-radius: 18px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: var(--trt-text-main); display: flex; flex-direction: column; gap: 12px; }
   .trt-deal-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; color: var(--trt-text-muted); gap: 10px; width: 100%; }
-  .trt-store-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--trt-card-border); padding: 6px 10px; border-radius: 10px; font-weight: 700; color: var(--trt-text-main); }
+  .trt-store-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--trt-card-border); padding: 6px 10px; border-radius: 10px; font-weight: 700; color: var(--trt-text-main); display: inline-flex; align-items: center; justify-content: center; text-align: center; }
   .trt-deal-type { color: var(--trt-accent); font-weight: 700; margin-left: auto !important; display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; text-align: right; white-space: nowrap; }
   .trt-deal-main { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
   .trt-deal-image-wrapper { position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid var(--trt-card-border); aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; }
@@ -528,7 +528,7 @@ class Trtai_Deal_Flow {
   .trt-promo-copy-button { background: var(--trt-accent); color: #031418; border: none; padding: 8px 12px; font-weight: 800; border-radius: 8px; cursor: pointer; }
   .trt-promo-copy-button:hover { transform: translateY(-1px); box-shadow: 0 12px 24px rgba(79,183,160,0.3); }
   .trt-promo-copied-toast { color: var(--trt-accent-soft); font-size: 0.85rem; }
-  .trt-cta-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-items: center; text-align: center; }
+  .trt-cta-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; text-align: center; }
   .trt-cta-button { display: flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; line-height: 1 !important; min-width: 220px; max-width: 100%; border-radius: 10px; padding: 12px 16px; font-weight: 800; text-decoration: none !important; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease, box-shadow 0.15s ease; background: var(--trt-accent); color: #fff; box-shadow: 0 12px 32px rgba(79,183,160,0.35); margin: 0 auto; }
   .trt-cta-button:hover,
   .trt-cta-button:focus { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(0,0,0,0.25); color: #fff; }

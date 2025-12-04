@@ -124,6 +124,10 @@ body {
     padding: 4px 8px;
     font-size: 0.8rem;
     color: var(--trt-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .trt-discount-badge {
@@ -133,6 +137,10 @@ body {
     padding: 4px 8px;
     border-radius: 10px;
     font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .trt-status {
@@ -191,6 +199,10 @@ body {
     border-radius: 10px;
     font-weight: 700;
     color: var(--trt-text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .trt-deal-type {
@@ -369,7 +381,7 @@ body {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     text-align: center;
 }
