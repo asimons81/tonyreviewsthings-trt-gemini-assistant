@@ -22,6 +22,13 @@ class Trtai_Deal_Flow {
     protected $settings;
 
     /**
+     * Cached settings array.
+     *
+     * @var array
+     */
+    protected $settings_data = array();
+
+    /**
      * Gemini client instance.
      *
      * @var Trtai_Gemini_Client
@@ -36,6 +43,7 @@ class Trtai_Deal_Flow {
      */
     public function __construct( Trtai_Settings $settings, Trtai_Gemini_Client $gemini_client ) {
         $this->settings      = $settings;
+        $this->settings_data = $settings->get_settings();
         $this->gemini_client = $gemini_client;
 
         add_action( 'admin_menu', array( $this, 'register_menu' ) );
@@ -62,7 +70,7 @@ class Trtai_Deal_Flow {
      * Render deal form.
      */
     public function render_page() {
-        $settings    = $this->settings->get_settings();
+        $settings    = $this->settings_data;
         $categories  = get_categories( array( 'hide_empty' => false ) );
         $default_cat = $this->find_category_id_by_name( 'Deals', $categories );
         include TRTAI_PLUGIN_DIR . 'admin/views/page-deal-form.php';
@@ -200,7 +208,7 @@ class Trtai_Deal_Flow {
         }
 
         $host = strtolower( $parsed['host'] );
-        $tag  = isset( $this->settings->get_settings()['amazon_tag'] ) ? $this->settings->get_settings()['amazon_tag'] : '';
+        $tag  = isset( $this->settings_data['amazon_tag'] ) ? $this->settings_data['amazon_tag'] : '';
 
         if ( false === strpos( $host, 'amazon.' ) || empty( $tag ) ) {
             return esc_url_raw( $url );
