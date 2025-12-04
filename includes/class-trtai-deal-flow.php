@@ -353,111 +353,56 @@ class Trtai_Deal_Flow {
             $style_printed  = true;
         }
 
-        ob_start();
-        ?>
-        <?php echo $style_block; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-        <article class="trt-deal-card" style="background: #111827; border: 1px solid #1f2937; border-radius: 18px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: #f9fafb; display: flex; flex-direction: column; gap: 12px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-            <header class="trt-deal-header" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; width: 100%; color: #9ca3af; gap: 10px;">
-                <span class="trt-store-badge" style="background: rgba(255,255,255,0.06); border: 1px solid #1f2937; padding: 6px 10px; border-radius: 10px; font-weight: bold; color: #f9fafb;">
-                    <?php echo esc_html( $store_name ); ?>
-                </span>
-                <span class="trt-deal-type" style="color: #4fb7a0; font-weight: bold; margin-left: auto!important; display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; text-align: right; white-space: nowrap;">
-                    <?php echo esc_html( $deal_type ); ?>
-                </span>
-            </header>
+        $card_html  = $style_block; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        $card_html .= '<article class="trt-deal-card" style="background: #111827; border: 1px solid #1f2937; border-radius: 18px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: #f9fafb; display: flex; flex-direction: column; gap: 12px; font-family: system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;">';
+        $card_html .= '<header class="trt-deal-header" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; width: 100%; color: #9ca3af; gap: 10px;"><span class="trt-store-badge" style="background: rgba(255,255,255,0.06); border: 1px solid #1f2937; padding: 6px 10px; border-radius: 10px; font-weight: bold; color: #f9fafb;">' . esc_html( $store_name ) . '</span><span class="trt-deal-type" style="color: #4fb7a0; font-weight: bold; margin-left: auto!important; display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; text-align: right; white-space: nowrap;">' . esc_html( $deal_type ) . '</span></header>';
+        $card_html .= '<div class="trt-deal-main" style="display: flex; flex-direction: column; gap: 14px; align-items: stretch;"><div class="trt-deal-image-wrapper" style="position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid #1f2937; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center;">';
+        if ( $image ) {
+            $card_html .= '<img class="trt-deal-image" style="max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; width: auto; height: auto; display: block; margin: auto;" src="' . esc_url( $image ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" />';
+        }
+        if ( $discount_label ) {
+            $card_html .= '<span class="trt-discount-badge" style="position: absolute; top: 10px; left: 10px; border-radius: 10px; box-shadow: 0 10px 20px rgba(79,183,160,0.4); background: #4fb7a0; color: #031418; font-weight: 800; padding: 6px 10px;">' . esc_html( $discount_label ) . '</span>';
+        }
+        $card_html .= '</div><div class="trt-deal-content" style="display: flex; flex-direction: column; gap: 10px;"><h2 class="trt-deal-title" style="font-size: 1.5rem; margin: 0; line-height: 1.2; color: #f9fafb;">' . esc_html( $title ) . '</h2>';
+        if ( $summary ) {
+            $card_html .= '<p class="trt-deal-tagline" style="color: #9ca3af; margin: 0;">' . wp_kses_post( $summary ) . '</p>';
+        }
+        if ( $formatted_current || $formatted_regular || $savings_amount_text ) {
+            $card_html .= '<div class="trt-price-row" style="display: flex; align-items: baseline; gap: 10px;">';
+            if ( $formatted_current ) {
+                $card_html .= '<span class="trt-price-current" style="color: #4fb7a0; font-size: 1.8rem; font-weight: 900;">' . esc_html( $formatted_current ) . '</span>';
+            }
+            if ( $formatted_regular ) {
+                $card_html .= '<span class="trt-price-original" style="color: #9ca3af; text-decoration: line-through;">' . esc_html( $formatted_regular ) . '</span>';
+            }
+            if ( $savings_amount_text ) {
+                $card_html .= '<span class="trt-price-savings" style="color: #d4f5ed; font-weight: bold;">' . sprintf( esc_html__( 'You save %s', 'trtai' ), esc_html( $savings_amount_text ) ) . '</span>';
+            }
+            $card_html .= '</div>';
+        }
+        if ( $coupon || $expires ) {
+            $card_html .= '<div class="trt-meta-row" style="display: flex; gap: 8px; flex-wrap: wrap;">';
+            if ( $coupon ) {
+                $card_html .= '<span class="trt-meta-chip" style="background: rgba(255,255,255,0.04); color: #9ca3af; border: 1px solid #1f2937; padding: 6px 10px; border-radius: 999px; font-size: 0.9rem;">' . sprintf( esc_html__( 'Coupon: %s', 'trtai' ), esc_html( $coupon ) ) . '</span>';
+            }
+            if ( $expires ) {
+                $card_html .= '<span class="trt-meta-chip" style="background: rgba(255,255,255,0.04); color: #9ca3af; border: 1px solid #1f2937; padding: 6px 10px; border-radius: 999px; font-size: 0.9rem;">' . sprintf( esc_html__( 'Expires %s', 'trtai' ), esc_html( $expires ) ) . '</span>';
+            }
+            $card_html .= '</div>';
+        }
+        if ( $coupon ) {
+            $card_html .= '<div class="trt-promo-card" style="background: #0b1017; border: 1px dashed #d4f5ed; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; gap: 1rem;"><div class="trt-promo-left" style="display: flex; flex-direction: column; gap: 4px;"><span class="trt-promo-label" style="font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; font-size: 0.85rem;">' . esc_html__( 'Promo code', 'trtai' ) . '</span><span class="trt-promo-code" style="font-family: &quot;SFMono-Regular&quot;, Menlo, Monaco, Consolas, &quot;Liberation Mono&quot;, &quot;Courier New&quot;, monospace; background: #020617; border: 1px solid #4fb7a0; padding: 6px 10px; border-radius: 10px; letter-spacing: 0.6px; font-weight: 800;">' . esc_html( $coupon ) . '</span>';
+            if ( $expires ) {
+                $card_html .= '<span class="trt-promo-expiry" style="color: #9ca3af; font-size: 0.9rem;">' . sprintf( esc_html__( 'Expires %s', 'trtai' ), esc_html( $expires ) ) . '</span>';
+            }
+            $card_html .= '</div></div>';
+        }
+        $card_html .= '<div class="trt-cta-row"><a class="trt-cta-button" href="' . esc_url( $norm_url ) . '" target="_blank" rel="nofollow sponsored noopener noreferrer">' . esc_html( $cta_text ) . '</a></div></div></div>';
+        $card_html .= '<footer class="trt-deal-footer" style="border-top: 1px solid #1f2937; padding-top: 10px; color: #9ca3af; font-size:0.95rem;"><span>' . esc_html__( 'Prices and availability can change quickly—double-check at checkout.', 'trtai' ) . '</span></footer>';
+        $card_html .= '</article>';
 
-            <div class="trt-deal-main" style="display: flex; flex-direction: column; gap: 14px; align-items: stretch;">
-                <div class="trt-deal-image-wrapper" style="position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid #1f2937; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center;">
-                    <?php if ( $image ) : ?>
-                        <img class="trt-deal-image" style="max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; width: auto; height: auto; display: block; margin: auto;" src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( $title ); ?>" loading="lazy" />
-                    <?php endif; ?>
-                    <?php if ( $discount_label ) : ?>
-                        <span class="trt-discount-badge" style="position: absolute; top: 10px; left: 10px; border-radius: 10px; box-shadow: 0 10px 20px rgba(79,183,160,0.4); background: #4fb7a0; color: #031418; font-weight: 800; padding: 6px 10px;">
-                            <?php echo esc_html( $discount_label ); ?>
-                        </span>
-                    <?php endif; ?>
-                </div>
+        return trim( $card_html );
 
-                <div class="trt-deal-content" style="display: flex; flex-direction: column; gap: 10px;">
-                    <h2 class="trt-deal-title" style="font-size: 1.5rem; margin: 0; line-height: 1.2; color: #f9fafb;">
-                        <?php echo esc_html( $title ); ?>
-                    </h2>
-                    <?php if ( $summary ) : ?>
-                        <p class="trt-deal-tagline" style="color: #9ca3af; margin: 0;">
-                            <?php echo wp_kses_post( $summary ); ?>
-                        </p>
-                    <?php endif; ?>
-
-                    <?php if ( $formatted_current || $formatted_regular || $savings_amount_text ) : ?>
-                        <div class="trt-price-row" style="display: flex; align-items: baseline; gap: 10px;">
-                            <?php if ( $formatted_current ) : ?>
-                                <span class="trt-price-current" style="color: #4fb7a0; font-size: 1.8rem; font-weight: 900;">
-                                    <?php echo esc_html( $formatted_current ); ?>
-                                </span>
-                            <?php endif; ?>
-                            <?php if ( $formatted_regular ) : ?>
-                                <span class="trt-price-original" style="color: #9ca3af; text-decoration: line-through;">
-                                    <?php echo esc_html( $formatted_regular ); ?>
-                                </span>
-                            <?php endif; ?>
-                            <?php if ( $savings_amount_text ) : ?>
-                                <span class="trt-price-savings" style="color: #d4f5ed; font-weight: bold;">
-                                    <?php printf( esc_html__( 'You save %s', 'trtai' ), esc_html( $savings_amount_text ) ); ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ( $coupon || $expires ) : ?>
-                        <div class="trt-meta-row" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                            <?php if ( $coupon ) : ?>
-                                <span class="trt-meta-chip" style="background: rgba(255,255,255,0.04); color: #9ca3af; border: 1px solid #1f2937; padding: 6px 10px; border-radius: 999px; font-size: 0.9rem;">
-                                    <?php printf( esc_html__( 'Coupon: %s', 'trtai' ), esc_html( $coupon ) ); ?>
-                                </span>
-                            <?php endif; ?>
-                            <?php if ( $expires ) : ?>
-                                <span class="trt-meta-chip" style="background: rgba(255,255,255,0.04); color: #9ca3af; border: 1px solid #1f2937; padding: 6px 10px; border-radius: 999px; font-size: 0.9rem;">
-                                    <?php printf( esc_html__( 'Expires %s', 'trtai' ), esc_html( $expires ) ); ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ( $coupon ) : ?>
-                        <div class="trt-promo-card" style="background: #0b1017; border: 1px dashed #d4f5ed; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; gap: 1rem;">
-                            <div class="trt-promo-left" style="display: flex; flex-direction: column; gap: 4px;">
-                                <span class="trt-promo-label" style="font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; font-size: 0.85rem;">
-                                    <?php esc_html_e( 'Promo code', 'trtai' ); ?>
-                                </span>
-                                <span class="trt-promo-code" style="font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; background: #020617; border: 1px solid #4fb7a0; padding: 6px 10px; border-radius: 10px; letter-spacing: 0.6px; font-weight: 800;">
-                                    <?php echo esc_html( $coupon ); ?>
-                                </span>
-                                <?php if ( $expires ) : ?>
-                                    <span class="trt-promo-expiry" style="color: #9ca3af; font-size: 0.9rem;">
-                                        <?php printf( esc_html__( 'Expires %s', 'trtai' ), esc_html( $expires ) ); ?>
-                                    </span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="trt-cta-row">
-                        <a class="trt-cta-button" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored noopener noreferrer">
-                            <?php echo esc_html( $cta_text ); ?>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <footer class="trt-deal-footer" style="border-top: 1px solid #1f2937; padding-top: 10px; color: #9ca3af; font-size: 0.95rem;">
-                <span>
-                    <?php esc_html_e( 'Prices and availability can change quickly—double-check at checkout.', 'trtai' ); ?>
-                </span>
-            </footer>
-        </article>
-        <?php
-
-        return trim( ob_get_clean() );
     }
 
     /**
