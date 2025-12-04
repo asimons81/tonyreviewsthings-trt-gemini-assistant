@@ -1,0 +1,61 @@
+<?php
+/**
+ * Deal generation form.
+ */
+?>
+<div class="wrap trtai-wrap">
+    <h1><?php esc_html_e( 'AI-Powered Deal Alert', 'trtai' ); ?></h1>
+    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="trtai-form">
+        <input type="hidden" name="action" value="trtai_generate_deal" />
+        <?php wp_nonce_field( 'trtai_generate_deal' ); ?>
+
+        <h2><?php esc_html_e( 'Product link', 'trtai' ); ?></h2>
+        <table class="form-table">
+            <tr><th><label for="deal_url"><?php esc_html_e( 'URL', 'trtai' ); ?></label></th><td><input type="url" name="deal_url" id="deal_url" class="regular-text" required></td></tr>
+        </table>
+
+        <h2><?php esc_html_e( 'Pricing context', 'trtai' ); ?></h2>
+        <table class="form-table">
+            <tr><th><label for="current_price"><?php esc_html_e( 'Current price', 'trtai' ); ?></label></th><td><input type="text" name="current_price" id="current_price" class="regular-text"></td></tr>
+            <tr><th><label for="original_price"><?php esc_html_e( 'Original price', 'trtai' ); ?></label></th><td><input type="text" name="original_price" id="original_price" class="regular-text"></td></tr>
+            <tr><th><label for="currency"><?php esc_html_e( 'Currency', 'trtai' ); ?></label></th><td><input type="text" name="currency" id="currency" class="small-text"></td></tr>
+            <tr><th><label for="coupon"><?php esc_html_e( 'Coupon code', 'trtai' ); ?></label></th><td><input type="text" name="coupon" id="coupon" class="regular-text"></td></tr>
+            <tr><th><label for="expires"><?php esc_html_e( 'Deal expiration', 'trtai' ); ?></label></th><td><input type="text" name="expires" id="expires" class="regular-text" placeholder="<?php esc_attr_e( 'YYYY-MM-DD or soon', 'trtai' ); ?>"></td></tr>
+        </table>
+
+        <h2><?php esc_html_e( 'Style', 'trtai' ); ?></h2>
+        <table class="form-table">
+            <tr><th><label for="post_type"><?php esc_html_e( 'Post type', 'trtai' ); ?></label></th><td>
+                <select name="post_type" id="post_type">
+                    <option value="quick"><?php esc_html_e( 'Quick deal alert', 'trtai' ); ?></option>
+                    <option value="mini-review"><?php esc_html_e( 'Mini review deal', 'trtai' ); ?></option>
+                </select>
+            </td></tr>
+        </table>
+
+        <h2><?php esc_html_e( 'SEO', 'trtai' ); ?></h2>
+        <table class="form-table">
+            <tr><th><label for="deal_keyphrase"><?php esc_html_e( 'Custom keyphrase', 'trtai' ); ?></label></th><td><input type="text" name="deal_keyphrase" id="deal_keyphrase" class="regular-text"></td></tr>
+        </table>
+
+        <h2><?php esc_html_e( 'Post settings', 'trtai' ); ?></h2>
+        <table class="form-table">
+            <tr><th><label for="category"><?php esc_html_e( 'Category', 'trtai' ); ?></label></th><td>
+                <?php
+                wp_dropdown_categories(
+                    array(
+                        'show_option_none' => __( 'Select category', 'trtai' ),
+                        'hide_empty'      => false,
+                        'name'            => 'category',
+                        'id'              => 'category',
+                        'selected'        => $default_cat,
+                    )
+                );
+                ?>
+            </td></tr>
+            <tr><th><label for="tags"><?php esc_html_e( 'Tags', 'trtai' ); ?></label></th><td><input type="text" name="tags" id="tags" class="regular-text" placeholder="<?php esc_attr_e( 'Comma-separated', 'trtai' ); ?>"></td></tr>
+        </table>
+
+        <?php submit_button( __( 'Generate Deal Draft', 'trtai' ) ); ?>
+    </form>
+</div>
