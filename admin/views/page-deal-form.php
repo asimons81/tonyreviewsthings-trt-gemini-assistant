@@ -28,6 +28,14 @@
             <tr><th><label for="image_url"><?php esc_html_e( 'Image URL', 'trtai' ); ?></label></th><td><input type="url" name="image_url" id="image_url" class="regular-text" placeholder="<?php esc_attr_e( 'https://example.com/product.jpg', 'trtai' ); ?>"></td></tr>
         </table>
 
+        <h2><?php esc_html_e( 'Deal card (optional overrides)', 'trtai' ); ?></h2>
+        <table class="form-table">
+            <tr><th><label for="cta_text"><?php esc_html_e( 'CTA text', 'trtai' ); ?></label></th><td><input type="text" name="cta_text" id="cta_text" class="regular-text" placeholder="<?php esc_attr_e( 'Get this deal', 'trtai' ); ?>"></td></tr>
+            <tr><th><label for="store_name"><?php esc_html_e( 'Store/brand name', 'trtai' ); ?></label></th><td><input type="text" name="store_name" id="store_name" class="regular-text" placeholder="<?php esc_attr_e( 'Amazon', 'trtai' ); ?>"></td></tr>
+            <tr><th><label for="deal_type"><?php esc_html_e( 'Deal type / badge label', 'trtai' ); ?></label></th><td><input type="text" name="deal_type" id="deal_type" class="regular-text" placeholder="<?php esc_attr_e( 'Lightning deal', 'trtai' ); ?>"></td></tr>
+            <tr><th><label for="deal_summary"><?php esc_html_e( 'Summary / tagline', 'trtai' ); ?></label></th><td><textarea name="deal_summary" id="deal_summary" class="large-text" rows="3" placeholder="<?php esc_attr_e( 'A quick hook for the deal card', 'trtai' ); ?>"></textarea></td></tr>
+        </table>
+
         <h2><?php esc_html_e( 'Style', 'trtai' ); ?></h2>
         <table class="form-table">
             <tr><th><label for="post_type"><?php esc_html_e( 'Post type', 'trtai' ); ?></label></th><td>
