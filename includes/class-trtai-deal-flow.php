@@ -157,9 +157,17 @@ class Trtai_Deal_Flow {
         if ( ! empty( $payload['card_meta']['summary'] ) ) {
             $data['tagline'] = $payload['card_meta']['summary'];
         }
+
+        $card_html = $this->build_product_card_html( $data, $norm_url );
+        $content   = wp_kses_post( $content );
+
+        if ( $card_html ) {
+            $content = $card_html . "\n\n" . $content;
+        }
+
         $postarr = array(
             'post_title'   => isset( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'New Deal', 'trtai' ),
-            'post_content' => wp_kses_post( $content ),
+            'post_content' => $content,
             'post_excerpt' => isset( $data['excerpt'] ) ? sanitize_text_field( $data['excerpt'] ) : '',
             'post_status'  => 'draft',
             'post_type'    => 'post',
