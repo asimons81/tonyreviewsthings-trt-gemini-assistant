@@ -23,6 +23,11 @@
             <tr><th><label for="expires"><?php esc_html_e( 'Deal expiration', 'trtai' ); ?></label></th><td><input type="text" name="expires" id="expires" class="regular-text" placeholder="<?php esc_attr_e( 'YYYY-MM-DD or soon', 'trtai' ); ?>"></td></tr>
         </table>
 
+        <h2><?php esc_html_e( 'Media', 'trtai' ); ?></h2>
+        <table class="form-table">
+            <tr><th><label for="image_url"><?php esc_html_e( 'Image URL', 'trtai' ); ?></label></th><td><input type="url" name="image_url" id="image_url" class="regular-text" placeholder="<?php esc_attr_e( 'https://example.com/product.jpg', 'trtai' ); ?>"></td></tr>
+        </table>
+
         <h2><?php esc_html_e( 'Style', 'trtai' ); ?></h2>
         <table class="form-table">
             <tr><th><label for="post_type"><?php esc_html_e( 'Post type', 'trtai' ); ?></label></th><td>
