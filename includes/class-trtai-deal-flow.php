@@ -259,106 +259,138 @@ class Trtai_Deal_Flow {
      * @return string
      */
     protected function build_product_card_html( $data, $norm_url ) {
-        $title   = ! empty( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'Featured deal', 'trtai' );
-        $excerpt = ! empty( $data['excerpt'] ) ? wp_kses_post( $data['excerpt'] ) : '';
-        $image   = ! empty( $data['image_url'] ) ? esc_url( $data['image_url'] ) : '';
+        $title    = ! empty( $data['title'] ) ? sanitize_text_field( $data['title'] ) : __( 'Featured deal', 'trtai' );
+        $tagline  = ! empty( $data['tagline'] ) ? wp_kses_post( $data['tagline'] ) : '';
+        $excerpt  = ! empty( $data['excerpt'] ) ? wp_kses_post( $data['excerpt'] ) : '';
+        $summary  = $tagline ? $tagline : $excerpt;
+        $image    = ! empty( $data['image_url'] ) ? esc_url( $data['image_url'] ) : '';
+        $cta_text = ! empty( $data['cta_text'] ) ? sanitize_text_field( $data['cta_text'] ) : __( 'Get this deal', 'trtai' );
 
-        $pricing         = isset( $data['pricing'] ) && is_array( $data['pricing'] ) ? $data['pricing'] : array();
-        $current_price   = ! empty( $pricing['current_price'] ) ? sanitize_text_field( $pricing['current_price'] ) : '';
-        $original_price  = ! empty( $pricing['original_price'] ) ? sanitize_text_field( $pricing['original_price'] ) : '';
-        $currency        = ! empty( $pricing['currency'] ) ? sanitize_text_field( $pricing['currency'] ) : '';
-        $coupon          = ! empty( $pricing['coupon'] ) ? sanitize_text_field( $pricing['coupon'] ) : '';
-        $expires         = ! empty( $pricing['expires'] ) ? sanitize_text_field( $pricing['expires'] ) : '';
-        $cta_text        = ! empty( $data['cta_text'] ) ? sanitize_text_field( $data['cta_text'] ) : __( 'Get this deal', 'trtai' );
+        $pricing        = isset( $data['pricing'] ) && is_array( $data['pricing'] ) ? $data['pricing'] : array();
+        $current_price  = ! empty( $pricing['current_price'] ) ? sanitize_text_field( $pricing['current_price'] ) : '';
+        $original_price = ! empty( $pricing['original_price'] ) ? sanitize_text_field( $pricing['original_price'] ) : '';
+        $currency       = ! empty( $pricing['currency'] ) ? sanitize_text_field( $pricing['currency'] ) : '';
+        $coupon         = ! empty( $pricing['coupon'] ) ? sanitize_text_field( $pricing['coupon'] ) : '';
+        $expires        = ! empty( $pricing['expires'] ) ? sanitize_text_field( $pricing['expires'] ) : '';
 
         $formatted_current = trim( $currency . ' ' . $current_price );
         $formatted_regular = trim( $currency . ' ' . $original_price );
 
-        $badges = array();
-        if ( $coupon ) {
-            $badges[] = array(
-                'class' => 'trtai-badge trtai-badge--saving',
-                'text'  => sprintf( __( 'Coupon: %s', 'trtai' ), $coupon ),
-            );
+        $host = wp_parse_url( $norm_url, PHP_URL_HOST );
+        if ( $host ) {
+            $host = preg_replace( '/^www\./', '', strtolower( $host ) );
         }
-        if ( $expires ) {
-            $badges[] = array(
-                'class' => 'trtai-badge trtai-badge--warning',
-                'text'  => sprintf( __( 'Ends %s', 'trtai' ), $expires ),
-            );
+
+        $store_name = ! empty( $data['store'] ) ? sanitize_text_field( $data['store'] ) : '';
+        if ( empty( $store_name ) && ! empty( $data['store_name'] ) ) {
+            $store_name = sanitize_text_field( $data['store_name'] );
         }
-        if ( empty( $badges ) ) {
-            $badges[] = array(
-                'class' => 'trtai-badge trtai-badge--primary',
-                'text'  => __( 'Featured deal', 'trtai' ),
-            );
+        if ( empty( $store_name ) && $host ) {
+            $store_name = ucfirst( $host );
         }
+        if ( empty( $store_name ) ) {
+            $store_name = __( 'Online store', 'trtai' );
+        }
+
+        $deal_type = ! empty( $data['deal_type'] ) ? sanitize_text_field( $data['deal_type'] ) : '';
+        if ( empty( $deal_type ) && isset( $data['style'] ) && is_array( $data['style'] ) && ! empty( $data['style']['post_type'] ) ) {
+            $deal_type = sanitize_text_field( $data['style']['post_type'] );
+        }
+        if ( empty( $deal_type ) ) {
+            $deal_type = __( 'Limited-time deal', 'trtai' );
+        }
+
+        $current_numeric  = $current_price ? floatval( preg_replace( '/[^0-9\.]/', '', $current_price ) ) : 0;
+        $original_numeric = $original_price ? floatval( preg_replace( '/[^0-9\.]/', '', $original_price ) ) : 0;
+        $discount_percent = 0;
+        if ( $current_numeric > 0 && $original_numeric > 0 && $original_numeric > $current_numeric ) {
+            $discount_percent = round( ( ( $original_numeric - $current_numeric ) / $original_numeric ) * 100 );
+        }
+
+        $discount_label   = $discount_percent ? sprintf( __( '%s%% OFF', 'trtai' ), $discount_percent ) : ( $coupon ? __( 'Stack coupon', 'trtai' ) : __( 'Deal price', 'trtai' ) );
+        $discount_support = $coupon ? sprintf( __( 'Use code %s', 'trtai' ), $coupon ) : ( $expires ? sprintf( __( 'Ends %s', 'trtai' ), $expires ) : __( 'Limited time', 'trtai' ) );
+        $savings_text     = $discount_percent ? sprintf( __( 'Save %s%% today', 'trtai' ), $discount_percent ) : '';
 
         ob_start();
         ?>
-        <div class="trtai-deal-card">
-            <div class="trtai-deal-card__header">
-                <div class="trtai-deal-card__badge-row">
-                    <?php foreach ( $badges as $badge ) : ?>
-                        <span class="<?php echo esc_attr( $badge['class'] ); ?>"><?php echo esc_html( $badge['text'] ); ?></span>
-                    <?php endforeach; ?>
+        <div class="trt-card">
+            <div class="trt-card__header">
+                <div class="trt-card__eyebrow">
+                    <span class="trt-pill trt-pill--store"><?php echo esc_html( $store_name ); ?></span>
+                    <span class="trt-pill trt-pill--type"><?php echo esc_html( $deal_type ); ?></span>
                 </div>
-                <span class="trtai-deal-card__chip"><?php esc_html_e( 'TRT AI verified pick', 'trtai' ); ?></span>
+                <span class="trt-chip trt-chip--verified"><?php esc_html_e( 'TRT AI verified pick', 'trtai' ); ?></span>
             </div>
 
-            <div class="trtai-deal-card__body">
-                <div class="trtai-deal-card__media" aria-hidden="<?php echo esc_attr( $image ? 'false' : 'true' ); ?>">
+            <div class="trt-card__body">
+                <div class="trt-card__media" aria-hidden="<?php echo esc_attr( $image ? 'false' : 'true' ); ?>">
                     <?php if ( $image ) : ?>
-                        <img class="trtai-deal-card__image" src="<?php echo esc_url( $image ); ?>" loading="lazy" alt="<?php echo esc_attr( $title ); ?>">
+                        <img class="trt-card__image" src="<?php echo esc_url( $image ); ?>" loading="lazy" alt="<?php echo esc_attr( $title ); ?>">
                     <?php else : ?>
-                        <div class="trtai-deal-card__placeholder"></div>
-                    <?php endif; ?>
-                </div>
-                <div class="trtai-deal-card__content">
-                    <h3 class="trtai-deal-card__title"><?php echo esc_html( $title ); ?></h3>
-                    <?php if ( $excerpt ) : ?>
-                        <p class="trtai-deal-card__excerpt"><?php echo wp_kses_post( $excerpt ); ?></p>
+                        <div class="trt-card__placeholder"></div>
                     <?php endif; ?>
 
-                    <?php if ( $formatted_current || $formatted_regular || $coupon || $expires ) : ?>
-                        <div class="trtai-deal-card__pricing-row">
+                    <div class="trt-card__discount-badge">
+                        <?php if ( $discount_label ) : ?>
+                            <span class="trt-discount__value"><?php echo esc_html( $discount_label ); ?></span>
+                        <?php endif; ?>
+                        <?php if ( $discount_support ) : ?>
+                            <span class="trt-discount__label"><?php echo esc_html( $discount_support ); ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="trt-card__content">
+                    <p class="trt-card__deal-type-label"><?php echo esc_html( $store_name . ' • ' . $deal_type ); ?></p>
+                    <h3 class="trt-card__title"><?php echo esc_html( $title ); ?></h3>
+                    <?php if ( $summary ) : ?>
+                        <p class="trt-card__tagline"><?php echo wp_kses_post( $summary ); ?></p>
+                    <?php endif; ?>
+
+                    <?php if ( $formatted_current || $formatted_regular || $coupon || $expires || $savings_text ) : ?>
+                        <div class="trt-card__pricing">
                             <?php if ( $formatted_current ) : ?>
-                                <span class="trtai-price">
-                                    <span class="trtai-price__label"><?php esc_html_e( 'Now', 'trtai' ); ?></span>
-                                    <span class="trtai-price__current"><?php echo esc_html( $formatted_current ); ?></span>
+                                <span class="trt-price">
+                                    <span class="trt-price__label"><?php esc_html_e( 'Price', 'trtai' ); ?></span>
+                                    <span class="trt-price__current"><?php echo esc_html( $formatted_current ); ?></span>
                                     <?php if ( $formatted_regular ) : ?>
-                                        <span class="trtai-price__regular"><?php echo esc_html( $formatted_regular ); ?></span>
+                                        <span class="trt-price__regular"><?php echo esc_html( $formatted_regular ); ?></span>
                                     <?php endif; ?>
                                 </span>
                             <?php endif; ?>
 
-                            <?php if ( $coupon && ! empty( $formatted_current ) ) : ?>
-                                <span class="trtai-badge trtai-badge--saving"><?php printf( esc_html__( 'Coupon: %s', 'trtai' ), esc_html( $coupon ) ); ?></span>
+                            <?php if ( $savings_text ) : ?>
+                                <span class="trt-pill trt-pill--saving"><?php echo esc_html( $savings_text ); ?></span>
                             <?php endif; ?>
 
-                            <?php if ( $expires && ! empty( $formatted_current ) ) : ?>
-                                <span class="trtai-badge trtai-badge--warning"><?php printf( esc_html__( 'Ends %s', 'trtai' ), esc_html( $expires ) ); ?></span>
+                            <?php if ( $coupon ) : ?>
+                                <span class="trt-pill trt-pill--coupon"><?php printf( esc_html__( 'Coupon: %s', 'trtai' ), esc_html( $coupon ) ); ?></span>
+                            <?php endif; ?>
+
+                            <?php if ( $expires ) : ?>
+                                <span class="trt-pill trt-pill--warning"><?php printf( esc_html__( 'Ends %s', 'trtai' ), esc_html( $expires ) ); ?></span>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
 
-                    <div class="trtai-deal-card__cta-row">
-                        <a class="trtai-deal-card__cta" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored"><?php echo esc_html( $cta_text ); ?></a>
-                        <span class="trtai-deal-card__cta-note"><?php esc_html_e( 'Opens in a new tab with our affiliate link', 'trtai' ); ?></span>
+                    <div class="trt-card__cta-row">
+                        <a class="trt-button" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored"><?php echo esc_html( $cta_text ); ?></a>
+                        <span class="trt-card__cta-note"><?php esc_html_e( 'Opens in a new tab with our affiliate link', 'trtai' ); ?></span>
                     </div>
                 </div>
             </div>
 
-            <div class="trtai-deal-card__footer">
-                <div class="trtai-deal-card__meta">
+            <div class="trt-card__footer">
+                <div class="trt-card__meta">
+                    <span class="trt-card__meta-item">🏬 <?php echo esc_html( $store_name ); ?></span>
                     <?php if ( $expires ) : ?>
-                        <span class="trtai-deal-card__meta-item">⏰ <?php printf( esc_html__( 'Ends %s', 'trtai' ), esc_html( $expires ) ); ?></span>
+                        <span class="trt-card__meta-item">⏰ <?php printf( esc_html__( 'Ends %s', 'trtai' ), esc_html( $expires ) ); ?></span>
                     <?php endif; ?>
                     <?php if ( $coupon ) : ?>
-                        <span class="trtai-deal-card__meta-item">🔖 <?php printf( esc_html__( 'Use coupon %s', 'trtai' ), esc_html( $coupon ) ); ?></span>
+                        <span class="trt-card__meta-item">🔖 <?php printf( esc_html__( 'Use coupon %s', 'trtai' ), esc_html( $coupon ) ); ?></span>
                     <?php endif; ?>
-                    <span class="trtai-deal-card__meta-item">⚡ <?php esc_html_e( 'Best pick curated by TRT', 'trtai' ); ?></span>
                 </div>
+                <span class="trt-card__disclaimer"><?php esc_html_e( 'Prices and availability can change quickly—double-check at checkout.', 'trtai' ); ?></span>
             </div>
         </div>
         <?php
