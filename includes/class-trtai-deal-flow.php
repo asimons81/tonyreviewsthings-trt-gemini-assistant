@@ -433,8 +433,8 @@ class Trtai_Deal_Flow {
                         </div>
                     <?php endif; ?>
 
-                    <div class="trt-cta-row" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start; align-items: center; text-align: center;">
-                        <a class="trt-cta-button" style="display: flex!important; align-items: center!important; justify-content: center!important; text-align: center!important; line-height: 1!important; min-width: 220px; max-width: 100%; border-radius: 10px; padding: 12px 16px; font-weight: 800; text-decoration: none!important; cursor: pointer; border: 1px solid transparent; transition: transform 0.15s ease,box-shadow 0.15s ease; background: #4fb7a0; color: #031418; box-shadow: 0 12px 32px rgba(79,183,160,0.35); margin: 0 auto;" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored noopener noreferrer">
+                    <div class="trt-cta-row">
+                        <a class="trt-cta-button" href="<?php echo esc_url( $norm_url ); ?>" target="_blank" rel="nofollow sponsored noopener noreferrer">
                             <?php echo esc_html( $cta_text ); ?>
                         </a>
                     </div>
@@ -564,12 +564,18 @@ STYLE;
      * Enqueue front-end styles for deal cards on generated posts.
      */
     public function enqueue_deal_styles() {
-        if ( ! is_singular( 'post' ) ) {
+        $post_id = get_queried_object_id();
+
+        if ( ! $post_id && is_preview() && isset( $_GET['preview_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            $post_id = absint( $_GET['preview_id'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        }
+
+        if ( ! $post_id ) {
             return;
         }
 
-        $post_id = get_queried_object_id();
-        if ( ! $post_id ) {
+        $post = get_post( $post_id );
+        if ( ! $post || 'post' !== $post->post_type ) {
             return;
         }
 
