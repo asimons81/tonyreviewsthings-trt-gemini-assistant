@@ -435,16 +435,16 @@ class Trtai_Deal_Flow {
         }
 
         $card_html  = $style_block; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        $card_html .= '<article class="trt-deal-card" style="background: #111827; border: 1px solid #1f2937; border-radius: 18px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: #f9fafb; display: flex; flex-direction: column; gap: 12px; font-family: system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;">';
+        $card_html .= '<article class="trt-deal-card" style="background: #111827; border: 1px solid #1f2937; border-radius: 18px; padding: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: #f9fafb; display: flex; flex-direction: column; gap: 14px; aspect-ratio: 16/9; font-family: system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif;">';
         $card_html .= '<header class="trt-deal-header" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; width: 100%; color: #9ca3af; gap: 10px;"><span class="trt-store-badge" style="background: rgba(255,255,255,0.06); border: 1px solid #1f2937; padding: 6px 10px; border-radius: 10px; font-weight: bold; color: #f9fafb;">' . esc_html( $store_name ) . '</span><span class="trt-deal-type" style="color: #4fb7a0; font-weight: bold; margin-left: auto!important; display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; text-align: right; white-space: nowrap;">' . esc_html( $deal_type ) . '</span></header>';
-        $card_html .= '<div class="trt-deal-main" style="display: flex; flex-direction: column; gap: 14px; align-items: stretch;"><div class="trt-deal-image-wrapper" style="position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid #1f2937; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center;">';
+        $card_html .= '<div class="trt-deal-main" style="display: flex; flex-direction: row; gap: 18px; align-items: stretch;"><div class="trt-deal-image-wrapper" style="position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid #1f2937; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; flex: 0 0 42%;">';
         if ( $image ) {
             $card_html .= '<img class="trt-deal-image" style="max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; width: auto; height: auto; display: block; margin: auto;" src="' . esc_url( $image ) . '" alt="' . esc_attr( $title ) . '" loading="lazy" />';
         }
         if ( $discount_label ) {
             $card_html .= '<span class="trt-discount-badge" style="position: absolute; top: 10px; left: 10px; border-radius: 10px; box-shadow: 0 10px 20px rgba(79,183,160,0.4); background: #4fb7a0; color: #031418; font-weight: 800; padding: 6px 10px;">' . esc_html( $discount_label ) . '</span>';
         }
-        $card_html .= '</div><div class="trt-deal-content" style="display: flex; flex-direction: column; gap: 10px;"><h2 class="trt-deal-title" style="font-size: 1.5rem; margin: 0; line-height: 1.2; color: #f9fafb;">' . esc_html( $title ) . '</h2>';
+        $card_html .= '</div><div class="trt-deal-content" style="display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto; justify-content: center;"><h2 class="trt-deal-title" style="font-size: 1.5rem; margin: 0; line-height: 1.2; color: #f9fafb;">' . esc_html( $title ) . '</h2>';
         if ( $summary ) {
             $card_html .= '<p class="trt-deal-tagline" style="color: #9ca3af; margin: 0;">' . wp_kses_post( $summary ) . '</p>';
         }
@@ -529,15 +529,15 @@ class Trtai_Deal_Flow {
   .trt-mini-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
   .trt-ghost-btn { border: 1px solid var(--trt-card-border); background: rgba(255,255,255,0.04); color: var(--trt-text-main); border-radius: 8px; padding: 6px 10px; font-size: 0.9rem; cursor: pointer; }
   .trt-ghost-btn:hover { border-color: var(--trt-accent); color: var(--trt-accent); }
-  .trt-deal-card { background: var(--trt-card-bg); border: 1px solid var(--trt-card-border); border-radius: 18px; padding: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: var(--trt-text-main); display: flex; flex-direction: column; gap: 12px; }
+  .trt-deal-card { background: var(--trt-card-bg); border: 1px solid var(--trt-card-border); border-radius: 18px; padding: 18px; box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: var(--trt-text-main); display: flex; flex-direction: column; gap: 14px; aspect-ratio: 16 / 9; }
   .trt-deal-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; color: var(--trt-text-muted); gap: 10px; width: 100%; }
   .trt-store-badge { background: rgba(255,255,255,0.06); border: 1px solid var(--trt-card-border); padding: 6px 10px; border-radius: 10px; font-weight: 700; color: var(--trt-text-main); display: inline-flex; align-items: center; justify-content: center; text-align: center; }
   .trt-deal-type { color: var(--trt-accent); font-weight: 700; margin-left: auto !important; display: inline-flex; align-items: center; justify-content: center; padding: 6px 10px; text-align: right; white-space: nowrap; }
-  .trt-deal-main { display: flex; flex-direction: column; gap: 14px; align-items: stretch; }
-  .trt-deal-image-wrapper { position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid var(--trt-card-border); aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; }
+  .trt-deal-main { display: flex; flex-direction: row; gap: 18px; align-items: stretch; }
+  .trt-deal-image-wrapper { position: relative; overflow: hidden; border-radius: 14px; background: #0b1017; border: 1px solid var(--trt-card-border); aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; padding: 10px; text-align: center; flex: 0 0 42%; }
   .trt-deal-image { max-width: 100%; max-height: 100%; object-fit: contain; object-position: center; width: auto; height: auto; display: block; margin: auto; }
   .trt-deal-image-wrapper .trt-discount-badge { position: absolute; top: 10px; left: 10px; border-radius: 10px; box-shadow: 0 10px 20px rgba(79,183,160,0.4); }
-  .trt-deal-content { display: flex; flex-direction: column; gap: 10px; }
+  .trt-deal-content { display: flex; flex-direction: column; gap: 12px; flex: 1 1 auto; justify-content: center; }
   .trt-deal-title { font-size: 1.5rem; margin: 0; line-height: 1.2; }
   .trt-deal-tagline { color: var(--trt-text-muted); margin: 0; }
   .trt-price-row { display: flex; align-items: baseline; gap: 10px; }
@@ -562,6 +562,8 @@ class Trtai_Deal_Flow {
   .trt-deal-footer { border-top: 1px solid var(--trt-card-border); padding-top: 10px; color: var(--trt-text-muted); font-size: 0.95rem; }
   @media (max-width: 1024px) {
     .trt-deal-main { flex-direction: column; }
+    .trt-deal-card { aspect-ratio: auto; }
+    .trt-deal-image-wrapper { flex-basis: auto; }
   }
 </style>
 STYLE;
