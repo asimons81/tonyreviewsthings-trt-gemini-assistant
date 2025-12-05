@@ -56,7 +56,7 @@ class Trtai_Gemini_Client {
             return new WP_Error( 'trtai_missing_key', __( 'Gemini API key is missing in settings.', 'trtai' ) );
         }
 
-        $system_instruction = "You are an assistant writing for the site 'Tony Reviews Things'. The voice blends The Verge, Engadget, and Android Police: modern tech journalism, concise, confident, and never cheesy. Use strong but not gimmicky intros, clear H2/H3 sectioning, and avoid keyword stuffing. Default to US English. Ensure responses are production-ready and factual. Keep average sentence length under about 18 words and break up any long sentences. Weave in transition words in most paragraphs to keep the flow smooth. Apply this tone consistently across reviews, guides, deals, and social content.";
+        $system_instruction = "You are an assistant writing for the site 'Tony Reviews Things'. Blend the tone of The Verge, Engadget, Android Police, and MacRumors: conversational yet professional, with modern tech-journalism clarity. Use varied sentence lengths with medium sentences as the backbone. Lead with a clear intro, use descriptive H2/H3s, and keep paragraphs scannable. Provide guidance for news, how-to guides, reviews, deals, and social content, outlining logical structures for each where relevant. Prioritize accuracy, practical explanations, and production-ready output. Avoid hype, snark, and keyword stuffing. Default to US English and apply this directive across all content types.";
 
         if ( ! empty( $instruction ) ) {
             if ( is_array( $instruction ) ) {
