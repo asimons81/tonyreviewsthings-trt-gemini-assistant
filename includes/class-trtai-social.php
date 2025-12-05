@@ -200,7 +200,7 @@ class Trtai_Social {
             return '';
         }
 
-        $instruction = 'Return JSON with a single key "caption" containing a short, catchy social post (max ~220 characters) suitable for general networks. Use Verge/Engadget/Android Police tone, include a hook and 1-2 purposeful hashtags, avoid emojis unless necessary.';
+        $instruction = 'Return JSON with a single key "caption" containing a mobile-friendly social blurb (max ~220 characters) suitable for general networks. Write like a conversational editor: clear hook first, then a quick why-it-matters. Vary sentence rhythm, stay concise, and use 1-2 purposeful hashtags. If details are thin, say so plainly. Keep the existing JSON shape and length/hashtag constraints; avoid emojis unless necessary.';
         $payload     = array(
             'title'   => $post->post_title,
             'excerpt' => $post->post_excerpt,
