@@ -103,7 +103,7 @@ class Trtai_Guide_Flow {
             exit;
         }
 
-        $instruction = 'Return JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, faq (array of question and answer objects), social_captions (threads, facebook, generic). Use HTML for content_html with H2/H3 and optional lists/steps. Keep tone confident and clear with the Verge/Engadget/Android Police voice. Use short, punchy sentences and deliberate transition words between sections or steps. Include concise, helpful FAQ entries.';
+        $instruction = 'Return JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, faq (array of question and answer objects), social_captions (threads, facebook, generic). Use HTML for content_html with descriptive H2/H3 headings. Open with a brief summary explaining why the guide matters, and write in a confident, clear newsroom voice with balanced sentence lengths and 2–4 sentence paragraphs. Include "Before you start," "Step-by-step," "Troubleshooting," and "Extra tips" sections. In the step-by-step section, use numbered steps and add short "What you should see" notes to confirm progress. Include concise, helpful FAQ entries and social captions.';
 
         $result = $this->gemini_client->generate_content( $instruction, $payload );
 
