@@ -112,7 +112,7 @@ class Trtai_Review_Flow {
             exit;
         }
 
-        $instruction = 'Return strict JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, pros (array), cons (array), social_captions (object with threads, facebook, generic). Write in HTML within content_html with H2/H3 structure, opinionated but concise. Ensure intro is strong and avoids fluff. Keep JSON valid.';
+        $instruction = 'Return strict JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, pros (array), cons (array), social_captions (object with threads, facebook, generic). Write in HTML within content_html with H2/H3 structure, opinionated but concise. Ensure intro is strong and avoids fluff. Keep JSON valid. Match the confident, conversational tech-journalism tone of The Verge, Engadget, and Android Police.';
 
         $result = $this->gemini_client->generate_content( $instruction, $payload );
 
