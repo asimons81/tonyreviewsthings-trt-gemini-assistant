@@ -44,6 +44,7 @@ class Trtai_Settings {
         $defaults = array(
             'gemini_api_key'           => '',
             'gemini_model'             => 'gemini-2.5-flash',
+            'http_timeout'             => 60,
             'amazon_tag'               => '',
             'threads_token'            => '',
             'facebook_token'           => '',
@@ -75,6 +76,10 @@ class Trtai_Settings {
         $output                              = array();
         $output['gemini_api_key']            = isset( $input['gemini_api_key'] ) ? sanitize_text_field( $input['gemini_api_key'] ) : '';
         $output['gemini_model']              = isset( $input['gemini_model'] ) ? sanitize_text_field( $input['gemini_model'] ) : 'gemini-2.5-flash';
+        $output['http_timeout']              = isset( $input['http_timeout'] ) ? absint( $input['http_timeout'] ) : 60;
+        if ( $output['http_timeout'] <= 0 ) {
+            $output['http_timeout'] = 60;
+        }
         $output['amazon_tag']                = isset( $input['amazon_tag'] ) ? sanitize_text_field( $input['amazon_tag'] ) : '';
         $output['threads_token']             = isset( $input['threads_token'] ) ? sanitize_text_field( $input['threads_token'] ) : '';
         $output['facebook_token']            = isset( $input['facebook_token'] ) ? sanitize_text_field( $input['facebook_token'] ) : '';

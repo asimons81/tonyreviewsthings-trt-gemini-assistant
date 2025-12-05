@@ -17,6 +17,13 @@
                 <td><input type="text" name="<?php echo esc_attr( Trtai_Settings::OPTION_KEY ); ?>[gemini_model]" id="trtai-gemini-model" value="<?php echo esc_attr( $settings['gemini_model'] ); ?>" class="regular-text" /></td>
             </tr>
             <tr>
+                <th scope="row"><label for="trtai-http-timeout"><?php esc_html_e( 'HTTP Timeout (seconds)', 'trtai' ); ?></label></th>
+                <td>
+                    <input type="number" name="<?php echo esc_attr( Trtai_Settings::OPTION_KEY ); ?>[http_timeout]" id="trtai-http-timeout" value="<?php echo esc_attr( $settings['http_timeout'] ); ?>" class="small-text" min="1" />
+                    <p class="description"><?php esc_html_e( 'How long to wait for Gemini responses before timing out. Increase if you see timeout errors.', 'trtai' ); ?></p>
+                </td>
+            </tr>
+            <tr>
                 <th scope="row"><label for="trtai-amazon-tag"><?php esc_html_e( 'Amazon Affiliate Tag', 'trtai' ); ?></label></th>
                 <td><input type="text" name="<?php echo esc_attr( Trtai_Settings::OPTION_KEY ); ?>[amazon_tag]" id="trtai-amazon-tag" value="<?php echo esc_attr( $settings['amazon_tag'] ); ?>" class="regular-text" /></td>
             </tr>
