@@ -262,7 +262,7 @@ class Trtai_Deal_Flow {
      * @return array|WP_Error
      */
     protected function generate_deal_content( $payload, $norm_url ) {
-        $instruction = 'Return JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, cta_text, social_captions (threads, facebook, generic). Content should be short, newsy, urgent, and explain why the deal matters. Include HTML for content_html, and keep CTA clear. Do not include markdown. Use a tone reminiscent of The Verge, Engadget, and Android Police.';
+        $instruction = 'Return JSON with keys: title, slug, meta_description, focus_keyphrase, excerpt, content_html, cta_text, social_captions (threads, facebook, generic). Lead with a clear news summary that explains what happened and why it matters. Use mixed sentence lengths with descriptive headings and scannable paragraphs. Keep the tone newsy and urgent, maintain clear CTA copy, and add honest context such as availability or rollout caveats. Include HTML for content_html, do not include markdown, and aim for a voice reminiscent of The Verge, Engadget, and Android Police.';
 
         $result = $this->gemini_client->generate_content( $instruction, $payload );
 
