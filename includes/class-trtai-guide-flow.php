@@ -114,7 +114,31 @@ class Trtai_Guide_Flow {
 
         $data = is_array( $result['parsed'] ) ? $result['parsed'] : json_decode( $result['text'], true );
         if ( ! is_array( $data ) ) {
-            wp_safe_redirect( add_query_arg( array( 'trtai_message' => 'error', 'trtai_error' => rawurlencode( __( 'Invalid response from Gemini.', 'trtai' ) ) ), wp_get_referer() ) );
+            $raw_text        = isset( $result['text'] ) ? (string) $result['text'] : '';
+            $error_text_base = __( 'Invalid response from Gemini.', 'trtai' );
+
+            $log_payload = wp_json_encode( $result );
+            if ( $log_payload ) {
+                error_log( 'TRTAI Gemini invalid response payload: ' . $log_payload );
+            }
+
+            $error_text = $error_text_base;
+
+            if ( $raw_text ) {
+                $plain_text   = wp_strip_all_tags( $raw_text );
+                $snippet      = mb_substr( $plain_text, 0, 200 );
+                $snippet_safe = sanitize_text_field( $snippet );
+
+                if ( $snippet_safe && mb_strlen( $plain_text ) > 200 ) {
+                    $snippet_safe .= '…';
+                }
+
+                if ( $snippet_safe ) {
+                    $error_text = sprintf( __( 'Invalid response from Gemini. Response snippet: "%s"', 'trtai' ), $snippet_safe );
+                }
+            }
+
+            wp_safe_redirect( add_query_arg( array( 'trtai_message' => 'error', 'trtai_error' => rawurlencode( $error_text ) ), wp_get_referer() ) );
             exit;
         }
 
